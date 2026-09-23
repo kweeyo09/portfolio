@@ -15,6 +15,7 @@ interface ProjectIndexProps {
 }
 
 function ProjectLink({ title, href }: Project) {
+  const displayTitle = title.toLowerCase();
   const [, setLocation] = useLocation();
   const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
   const bodiesRef = useRef<Body[]>([]);
@@ -45,7 +46,7 @@ function ProjectLink({ title, href }: Project) {
       bodiesRef.current = letters.map((letter, index) => {
         const bounds = letter.getBoundingClientRect();
         return Bodies.rectangle(origins[index].x, origins[index].y, Math.max(bounds.width, 8), Math.max(bounds.height, 16), {
-          frictionAir: 0.14,
+          frictionAir: 0.09,
           collisionFilter: { group: -1 },
         });
       });
@@ -53,8 +54,8 @@ function ProjectLink({ title, href }: Project) {
         pointA: origins[index],
         bodyB: body,
         length: 0,
-        stiffness: 0.075,
-        damping: 0.22,
+        stiffness: 0.065,
+        damping: 0.14,
       }));
       Composite.add(engine.world, [...bodiesRef.current, ...constraintsRef.current]);
     };
@@ -97,8 +98,8 @@ function ProjectLink({ title, href }: Project) {
     if (leavingRef.current) return;
     const body = bodiesRef.current[index];
     if (!body) return;
-    Body.setVelocity(body, { x: (Math.random() - 0.5) * 2.5, y: -1.7 - Math.random() });
-    Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.06);
+    Body.setVelocity(body, { x: (Math.random() - 0.5) * 4.2, y: -3.2 - Math.random() * 1.8 });
+    Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.12);
   };
 
   const jiggleAll = () => bodiesRef.current.forEach((_, index) => jiggle(index));
@@ -125,9 +126,9 @@ function ProjectLink({ title, href }: Project) {
 
   let letterIndex = 0;
   return (
-    <a className="project-index__link" href={href} onClick={openProject} onPointerEnter={jiggleAll} aria-label={`View ${title}`}>
+    <a className="project-index__link" href={href} onClick={openProject} onPointerEnter={jiggleAll} aria-label={`view ${displayTitle}`}>
       <span className="project-index__title" aria-hidden="true">
-        {title.split(' ').map((word, wordIndex) => (
+        {displayTitle.split(' ').map((word, wordIndex) => (
           <Fragment key={`${word}-${wordIndex}`}>
             {wordIndex > 0 && ' '}
             <span className="project-index__word">
@@ -148,13 +149,13 @@ export default function ProjectIndex({ heading, description, projects }: Project
 
   return (
     <main className="project-index">
-      <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>Back</button>
+      <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>back</button>
       <div className="project-index__content">
         <header className="project-index__header">
-          <h1>{heading}</h1>
-          <p>{description}</p>
+          <h1>{heading.toLowerCase()}</h1>
+          <p>{description.toLowerCase()}</p>
         </header>
-        <nav className="project-index__list" aria-label={`${heading} projects`}>
+        <nav className="project-index__list" aria-label={`${heading.toLowerCase()} projects`}>
           {projects.map(project => <ProjectLink key={project.href} {...project} />)}
         </nav>
       </div>
