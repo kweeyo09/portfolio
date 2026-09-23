@@ -316,12 +316,14 @@ async function buildParticles(
 }
 
 /* ── MAIN COMPONENT ─────────────────────────────────────────────── */
-export default function Home() {
+export default function Home({ active = true, onReady }: { active?: boolean; onReady?: () => void }) {
   const [showResume, setShowResume] = useState(false);
   const mountRef      = useRef<HTMLDivElement>(null);
   const labelRef      = useRef<HTMLDivElement>(null);
-  const loadRef       = useRef<HTMLDivElement>(null);
-  const loadTxtRef    = useRef<HTMLDivElement>(null);
+  const activeRef     = useRef(active);
+  const onReadyRef    = useRef(onReady);
+  activeRef.current = active;
+  onReadyRef.current = onReady;
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -376,56 +378,54 @@ export default function Home() {
     /* ── LOAD ALL FLOWERS ── */
     const loader = new GLTFLoader();
     let loadedCount = 0;
-
-    const setLoadText = (t: string) => {
-      if (loadTxtRef.current) loadTxtRef.current.textContent = t;
-    };
-
-    const tryHideLoader = () => {
+    let readySignaled = false;
+    let readyFrame = 0;
+    const markLoaded = (idx: number) => {
       loadedCount++;
-      if (loadedCount >= N_FLOWERS && loadRef.current) {
-        loadRef.current.style.transition = 'opacity 0.6s';
-        loadRef.current.style.opacity = '0';
-        setTimeout(() => { if (loadRef.current) loadRef.current.style.display = 'none'; }, 700);
+      if (!readySignaled && (idx === 0 || loadedCount === N_FLOWERS)) {
+        readySignaled = true;
+        readyFrame = requestAnimationFrame(() => onReadyRef.current?.());
       }
     };
 
     const loadFlower = (url: string, idx: number, fallback: [number,number,number]) => {
-      setLoadText(`Loading ${FLOWER_NAMES[idx]}… (${idx + 1}/${N_FLOWERS})`);
       loader.load(url, async (gltf) => {
-        const { geo } = await buildParticles(gltf, fallback);
+        try {
+          const { geo } = await buildParticles(gltf, fallback);
 
-        const mat = new THREE.ShaderMaterial({
-          vertexShader: VERT,
-          fragmentShader: FRAG,
-          uniforms: {
-            uProgress: { value: 0 },
-            uTime:     { value: 0 },
-            uSize:     { value: PARTICLE_SIZE },
-          },
-          vertexColors: false,
-          transparent: true,
-          depthWrite: false,
-          blending: THREE.NormalBlending,
-        });
+          const mat = new THREE.ShaderMaterial({
+            vertexShader: VERT,
+            fragmentShader: FRAG,
+            uniforms: {
+              uProgress: { value: 0 },
+              uTime:     { value: 0 },
+              uSize:     { value: PARTICLE_SIZE },
+            },
+            vertexColors: false,
+            transparent: true,
+            depthWrite: false,
+            blending: THREE.NormalBlending,
+          });
 
-        const points = new THREE.Points(geo, mat);
-        points.frustumCulled = false;
-        points.visible = true;
-        points.position.x = FLOWER_X[idx];
+          const points = new THREE.Points(geo, mat);
+          points.frustumCulled = false;
+          points.visible = true;
+          points.position.x = FLOWER_X[idx];
 
-        scene.add(points);
-        flowers[idx].points = points;
-        flowers[idx].mat    = mat;
-        flowers[idx].loaded = true;
+          scene.add(points);
+          flowers[idx].points = points;
+          flowers[idx].mat    = mat;
+          flowers[idx].loaded = true;
 
-        tryHideLoader();
-        updateLabel();
-      }, (xhr) => {
-        if (xhr.total) setLoadText(`Loading ${FLOWER_NAMES[idx]}… ${Math.round(xhr.loaded/xhr.total*100)}% (${idx+1}/${N_FLOWERS})`);
-      }, (err) => {
+          updateLabel();
+        } catch (err) {
+          console.error(`[LOAD] Failed: ${FLOWER_NAMES[idx]}`, err);
+        } finally {
+          markLoaded(idx);
+        }
+      }, undefined, (err) => {
         console.error(`[LOAD] Failed: ${FLOWER_NAMES[idx]}`, err);
-        tryHideLoader();
+        markLoaded(idx);
       });
     };
 
@@ -467,6 +467,7 @@ export default function Home() {
 
     /* ── KEYBOARD FALLBACK ── */
     const onKey = (e: KeyboardEvent) => {
+      if (!activeRef.current) return;
       if (e.code === 'Space') {
         e.preventDefault();
         const f = flowers[activeIdx];
@@ -484,6 +485,7 @@ export default function Home() {
     /* ── MOUSE WHEEL: cycle flowers ── */
     let wheelCooldown = 0;
     const onWheel = (e: WheelEvent) => {
+      if (!activeRef.current) return;
       // Only cycle if not zooming (ctrl key = pinch-zoom on trackpad)
       if (e.ctrlKey) return;
       const now = Date.now();
@@ -499,10 +501,12 @@ export default function Home() {
     let touchStartY = 0;
     let touchCooldown = 0;
     const onTouchStart = (e: TouchEvent) => {
+      if (!activeRef.current) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     };
     const onTouchEnd = (e: TouchEvent) => {
+      if (!activeRef.current) return;
       const touchEndX = e.changedTouches[0].clientX;
       const touchEndY = e.changedTouches[0].clientY;
       const deltaX = touchEndX - touchStartX;
@@ -522,6 +526,7 @@ export default function Home() {
     /* ── CANVAS CLICK / TAP: scatter particles ── */
     const portfolioRoutes = ['/ui-design', '/product-design', '/3d-motion'];
     const onCanvasClick = () => {
+      if (!activeRef.current) return;
       const f = flowers[activeIdx];
       if (f.targetProgress > 0.5) {
         f.targetProgress = 0;
@@ -581,6 +586,7 @@ export default function Home() {
     /* ── CLEANUP ── */
     return () => {
       cancelAnimationFrame(raf);
+      cancelAnimationFrame(readyFrame);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
       renderer.domElement.removeEventListener('wheel', onWheel);
@@ -604,18 +610,6 @@ export default function Home() {
     <div style={{ width: '100vw', height: '100vh', background: '#000', overflow: 'hidden', position: 'relative' }}>
       {/* Three.js canvas mount */}
       <div ref={mountRef} style={{ position: 'absolute', inset: 0 }} />
-
-      {/* Loading overlay */}
-      <div ref={loadRef} style={{
-        position: 'absolute', inset: 0, background: '#000',
-        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-        zIndex: 100,
-      }}>
-        <div ref={loadTxtRef} style={{
-          color: 'rgba(255,255,255,0.5)', fontFamily: "'Barlow', sans-serif",
-          fontSize: '0.8rem', letterSpacing: '0.15em',
-        }}>Loading…</div>
-      </div>
 
       {/* Flower label */}
       <div ref={labelRef} style={{

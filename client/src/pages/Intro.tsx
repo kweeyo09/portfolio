@@ -18,7 +18,7 @@ const lines = [
 
 type Accent = 'designer' | 'studio' | null;
 
-export default function Intro() {
+export default function Intro({ flowersReady }: { flowersReady: boolean }) {
   const [, setLocation] = useLocation();
   const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
   const bodiesRef = useRef<Body[]>([]);
@@ -26,6 +26,7 @@ export default function Intro() {
   const engineRef = useRef<Engine | null>(null);
   const exitingRef = useRef(false);
   const [exiting, setExiting] = useState(false);
+  const [entryRequested, setEntryRequested] = useState(false);
   const [hoveredAccent, setHoveredAccent] = useState<Accent>(null);
 
   useEffect(() => {
@@ -102,11 +103,10 @@ export default function Intro() {
     }
   };
 
-  const enter = () => {
-    if (exitingRef.current) return;
+  useEffect(() => {
+    if (!entryRequested || !flowersReady || exitingRef.current) return;
     exitingRef.current = true;
     setExiting(true);
-    void import('./Home');
     const engine = engineRef.current;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (!engine || reducedMotion) {
@@ -120,7 +120,9 @@ export default function Intro() {
       Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.23);
     });
     window.setTimeout(() => setLocation('/flowers'), 1150);
-  };
+  }, [entryRequested, flowersReady, setLocation]);
+
+  const enter = () => setEntryRequested(true);
 
   let letterIndex = 0;
 
@@ -156,7 +158,6 @@ export default function Intro() {
             </span>
           ))}
         </button>
-        <p className="intro-hint">Move over the words · Click to enter</p>
       </div>
 
       <div className="intro-edge" aria-hidden="true">KIXIZZ STUDIO · LONDON</div>

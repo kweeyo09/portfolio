@@ -1,8 +1,8 @@
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useCallback, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch } from "wouter";
+import { Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Intro from "./pages/Intro";
@@ -18,12 +18,34 @@ const JellyFlowerProject = lazy(() => import("./pages/JellyFlowerProject"));
 const Limelight = lazy(() => import("./pages/Limelight"));
 
 
+function StudioEntry({ introVisible }: { introVisible: boolean }) {
+  const [flowersReady, setFlowersReady] = useState(false);
+  const handleReady = useCallback(() => setFlowersReady(true), []);
+
+  return (
+    <>
+      <div inert={introVisible}>
+        <Suspense fallback={null}>
+          <Home active={!introVisible} onReady={handleReady} />
+        </Suspense>
+      </div>
+      {introVisible && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 2000 }}>
+          <Intro flowersReady={flowersReady} />
+        </div>
+      )}
+    </>
+  );
+}
+
 function Router() {
-  // make sure to consider if you need authentication for certain routes
+  const [location] = useLocation();
+  if (location === "/" || location === "/flowers") {
+    return <StudioEntry introVisible={location === "/"} />;
+  }
+
   return (
     <Switch>
-      <Route path={"/"} component={Intro} />
-      <Route path={"/flowers"} component={Home} />
       <Route path={"/ui-design"} component={UIDesign} />
       <Route path={"/3d-motion"} component={ThreeDMotion} />
       <Route path={"/product-design"} component={ProductDesign} />
@@ -53,7 +75,7 @@ function App() {
       >
         <TooltipProvider>
           <Toaster />
-          <Suspense fallback={<div style={{ minHeight: "100svh", display: "grid", placeItems: "center", background: "#050505", color: "#f8f5ef", fontFamily: "'Barlow', sans-serif" }}>Loading studio…</div>}>
+          <Suspense fallback={null}>
             <Router />
           </Suspense>
         </TooltipProvider>

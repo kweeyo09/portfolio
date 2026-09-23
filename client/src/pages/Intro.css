@@ -7,6 +7,7 @@
   overflow: hidden;
   background: #050505;
   color: #f8f5ef;
+  transition: background-color 900ms ease;
 }
 
 .intro::before {
@@ -15,6 +16,7 @@
   inset: 0;
   pointer-events: none;
   background: radial-gradient(ellipse 65% 35% at 50% 50%, rgba(88, 59, 76, 0.12), transparent 75%);
+  transition: opacity 900ms ease;
 }
 
 .intro-header {
@@ -128,16 +130,6 @@
   transform: scaleX(1);
 }
 
-.intro-hint {
-  margin-top: clamp(34px, 7vh, 72px);
-  color: rgba(248, 245, 239, 0.63);
-  font-family: 'Barlow', sans-serif;
-  font-size: 0.82rem;
-  font-weight: 400;
-  letter-spacing: 0.12em;
-  transition: opacity 350ms ease;
-}
-
 .intro-edge {
   position: absolute;
   right: clamp(22px, 4vw, 64px);
@@ -148,8 +140,16 @@
   transition: opacity 350ms ease;
 }
 
+.intro--exiting {
+  background-color: transparent;
+}
+
+.intro--exiting::before {
+  opacity: 0;
+}
+
 .intro--exiting .intro-title,
-.intro--exiting .intro-hint,
+.intro--exiting .intro-header,
 .intro--exiting .intro-edge {
   opacity: 0;
 }
@@ -162,7 +162,6 @@
   .intro-center { width: min(90vw, 460px); }
   .intro-title { margin-bottom: 36px; }
   .intro-enter { font-size: clamp(1.45rem, 6.4vw, 2rem); line-height: 1.48; }
-  .intro-hint { font-size: 0.7rem; letter-spacing: 0.06em; }
   .intro-edge { display: none; }
 }
 
