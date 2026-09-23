@@ -18,11 +18,9 @@ const JellyFlowerProject = lazy(() => import("./pages/JellyFlowerProject"));
 const Limelight = lazy(() => import("./pages/Limelight"));
 
 
-function StudioEntry({ location }: { location: string }) {
+function StudioEntry({ introVisible, onEnterComplete }: { introVisible: boolean; onEnterComplete: () => void }) {
   const [flowersReady, setFlowersReady] = useState(false);
-  const [showIntroOnFlowers, setShowIntroOnFlowers] = useState(location === "/flowers");
   const handleReady = useCallback(() => setFlowersReady(true), []);
-  const introVisible = location === "/" || showIntroOnFlowers;
 
   return (
     <>
@@ -33,17 +31,18 @@ function StudioEntry({ location }: { location: string }) {
       </div>
       {introVisible && (
         <div style={{ position: "fixed", inset: 0, zIndex: 2000 }}>
-          <Intro flowersReady={flowersReady} onEnterComplete={() => setShowIntroOnFlowers(false)} />
+          <Intro flowersReady={flowersReady} onEnterComplete={onEnterComplete} />
         </div>
       )}
     </>
   );
 }
 
-function Router() {
+function Router({ initialPath, introDismissed, onEnterComplete }: { initialPath: string; introDismissed: boolean; onEnterComplete: () => void }) {
   const [location] = useLocation();
   if (location === "/" || location === "/flowers") {
-    return <StudioEntry location={location} />;
+    const introVisible = !introDismissed && (location === "/" || initialPath === "/flowers");
+    return <StudioEntry introVisible={introVisible} onEnterComplete={onEnterComplete} />;
   }
 
   return (
@@ -69,6 +68,10 @@ function Router() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
+  const [initialPath] = useState(() => window.location.pathname);
+  const [introDismissed, setIntroDismissed] = useState(false);
+  const handleEnterComplete = useCallback(() => setIntroDismissed(true), []);
+
   return (
     <ErrorBoundary>
       <ThemeProvider
@@ -78,7 +81,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Suspense fallback={null}>
-            <Router />
+            <Router initialPath={initialPath} introDismissed={introDismissed} onEnterComplete={handleEnterComplete} />
           </Suspense>
         </TooltipProvider>
       </ThemeProvider>

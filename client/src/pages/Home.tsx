@@ -664,8 +664,8 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
         }
       `}</style>
 
-      {/* Return to the introduction */}
-      <a href="/" aria-label="Back to introduction" style={{
+      {/* Studio mark */}
+      <div style={{
         position: 'absolute', top: 'max(12px, env(safe-area-inset-top))', left: 'max(12px, env(safe-area-inset-left))',
         zIndex: 1000,
       }}>
@@ -678,7 +678,7 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
             opacity: 0.9,
           }}
         />
-      </a>
+      </div>
 
       {/* Social profiles and résumé */}
       <div style={{

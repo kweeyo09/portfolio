@@ -148,7 +148,7 @@ export default function ProjectIndex({ heading, description, projects }: Project
 
   return (
     <main className="project-index">
-      <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>Back to flowers</button>
+      <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>Back</button>
       <div className="project-index__content">
         <header className="project-index__header">
           <h1>{heading}</h1>

@@ -501,7 +501,7 @@ export default function BudgetApp() {
         onMouseEnter={e => { e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.2), 0 0 12px rgba(255,255,255,0.08)'; }}
         onMouseLeave={e => { e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.1)'; }}
       >
-        ← BACK
+        Back
       </button>
 
       {/* Page header */}
