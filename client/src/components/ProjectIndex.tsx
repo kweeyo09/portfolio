@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useRef, useState, type MouseEvent } from 'react';
+import { Fragment, useEffect, useRef, type MouseEvent } from 'react';
 import { Bodies, Body, Composite, Constraint, Engine } from 'matter-js';
 import { useLocation } from 'wouter';
 import './ProjectIndex.css';
@@ -22,7 +22,6 @@ function ProjectLink({ title, href }: Project) {
   const engineRef = useRef<Engine | null>(null);
   const leavingRef = useRef(false);
   const timerRef = useRef<number | null>(null);
-  const [leaving, setLeaving] = useState(false);
 
   useEffect(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -109,7 +108,6 @@ function ProjectLink({ title, href }: Project) {
     event.preventDefault();
     if (leavingRef.current) return;
     leavingRef.current = true;
-    setLeaving(true);
 
     const engine = engineRef.current;
     if (!engine) {
@@ -127,7 +125,7 @@ function ProjectLink({ title, href }: Project) {
 
   let letterIndex = 0;
   return (
-    <a className={`project-index__link${leaving ? ' project-index__link--leaving' : ''}`} href={href} onClick={openProject} onPointerEnter={jiggleAll} aria-label={`View ${title}`}>
+    <a className="project-index__link" href={href} onClick={openProject} onPointerEnter={jiggleAll} aria-label={`View ${title}`}>
       <span className="project-index__title" aria-hidden="true">
         {title.split(' ').map((word, wordIndex) => (
           <Fragment key={`${word}-${wordIndex}`}>
@@ -141,9 +139,6 @@ function ProjectLink({ title, href }: Project) {
           </Fragment>
         ))}
       </span>
-      <svg className="project-index__arrow" viewBox="0 0 32 32" fill="none" aria-hidden="true">
-        <path d="M5 16h21m-8-8 8 8-8 8" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-      </svg>
     </a>
   );
 }
@@ -153,7 +148,7 @@ export default function ProjectIndex({ heading, description, projects }: Project
 
   return (
     <main className="project-index">
-      <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>← Back to flowers</button>
+      <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>Back to flowers</button>
       <div className="project-index__content">
         <header className="project-index__header">
           <h1>{heading}</h1>

@@ -53,31 +53,31 @@
 }
 
 .project-index__list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(20px, 4vh, 40px);
   margin-top: clamp(64px, 10vh, 120px);
-  border-top: 1px solid rgba(248, 245, 239, 0.2);
 }
 
 .project-index__link {
-  display: flex;
-  min-height: clamp(104px, 12vw, 156px);
-  align-items: center;
-  justify-content: space-between;
-  gap: 20px;
-  padding: 22px 4px;
-  border-bottom: 1px solid rgba(248, 245, 239, 0.2);
-  color: #f8f5ef;
+  display: inline-block;
+  max-width: 100%;
+  padding: 8px 0;
+  color: rgba(248, 245, 239, 0.78);
   text-decoration: none;
-  transition: color 250ms ease;
+  transition: color 250ms ease, text-shadow 250ms ease;
 }
 
 .project-index__link:hover,
 .project-index__link:focus-visible {
-  color: #f4d8e2;
+  color: #ffe3ee;
+  text-shadow: 0 0 20px rgba(255, 177, 209, 0.48);
 }
 
 .project-index__title {
-  font: italic 400 clamp(2.2rem, 5vw, 4.25rem)/1.07 'Instrument Serif', serif;
-  letter-spacing: -0.025em;
+  font: italic 400 clamp(1.9rem, 3.2vw, 3rem)/1.15 'Instrument Serif', serif;
+  letter-spacing: -0.015em;
 }
 
 .project-index__word,
@@ -92,24 +92,6 @@
 .project-index__letter {
   position: relative;
   will-change: transform;
-}
-
-.project-index__arrow {
-  width: 32px;
-  height: 32px;
-  flex: none;
-  color: rgba(248, 245, 239, 0.6);
-  transition: transform 250ms ease, color 250ms ease, opacity 250ms ease;
-}
-
-.project-index__link:hover .project-index__arrow,
-.project-index__link:focus-visible .project-index__arrow {
-  transform: translateX(8px);
-  color: #f4d8e2;
-}
-
-.project-index__link--leaving .project-index__arrow {
-  opacity: 0;
 }
 
 @media (max-width: 600px) {
@@ -130,25 +112,14 @@
     margin-top: 72px;
   }
 
-  .project-index__link {
-    min-height: 104px;
-    padding: 18px 2px;
-  }
-
   .project-index__title {
-    font-size: clamp(1.8rem, 7.4vw, 2.6rem);
-  }
-
-  .project-index__arrow {
-    width: 25px;
-    height: 25px;
+    font-size: clamp(1.55rem, 5.8vw, 2rem);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .project-index__back,
-  .project-index__link,
-  .project-index__arrow {
+  .project-index__link {
     transition-duration: 0.01ms;
   }
 }
