@@ -18,6 +18,7 @@
 
 import { useEffect, useRef, useState } from 'react';
 import ResumeModal from '../components/ResumeModal';
+import SocialLinks from '../components/SocialLinks';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -669,44 +670,28 @@ export default function Home() {
         }
       `}</style>
 
-      {/* Logo - Left side */}
-      <div style={{
+      {/* Return to the introduction */}
+      <a href="/" aria-label="Back to introduction" style={{
         position: 'absolute', top: 'max(12px, env(safe-area-inset-top))', left: 'max(12px, env(safe-area-inset-left))',
-        pointerEvents: 'none',
+        zIndex: 1000,
       }}>
         <img
           src="/assets/kixiz-logo_ce4a8d4a.png"
-          alt="KIXIZ Studio"
+          alt="KIXIZZ Studio"
           style={{
             width: 'clamp(40px, 8vw, 60px)',
             height: 'auto',
             opacity: 0.9,
           }}
         />
-      </div>
+      </a>
 
-      {/* Right sidebar - About & Contact buttons - responsive */}
+      {/* Social profiles and résumé */}
       <div style={{
         position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 'max(16px, env(safe-area-inset-right))',
         display: 'flex', gap: 'clamp(8px, 3vw, 24px)', flexWrap: 'wrap', justifyContent: 'flex-end',
       }}>
-        <button
-          className="liquid-glass"
-          onClick={() => window.location.href = '/about'}
-          style={{
-            borderRadius: 8, color: '#fff', fontFamily: "'Barlow', sans-serif",
-            fontSize: 'clamp(0.6rem, 2vw, 0.75rem)', letterSpacing: '0.15em', padding: 'clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 16px)',
-            cursor: 'pointer', transition: 'all 0.3s ease', fontWeight: '400',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.2), 0 0 12px rgba(255,255,255,0.08)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.1)';
-          }}
-        >
-          ABOUT
-        </button>
+        <SocialLinks />
         <button
           className="liquid-glass"
           onClick={() => setShowResume(true)}

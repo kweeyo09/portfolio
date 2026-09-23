@@ -57,7 +57,7 @@ export default function UIDesign() {
       {/* Back button */}
       <button
         className="liquid-glass"
-        onClick={() => setLocation('/')}
+        onClick={() => setLocation('/flowers')}
         style={{
           position: 'fixed', top: 32, left: 32,
           borderRadius: 8, color: '#fff', fontFamily: "'Barlow', sans-serif",

@@ -58,7 +58,7 @@ export default function ProductDesign() {
       {/* Back button */}
       <button
         className="liquid-glass"
-        onClick={() => setLocation('/')}
+        onClick={() => setLocation('/flowers')}
         style={{
           position: 'fixed',
           top: 32,
