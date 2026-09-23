@@ -133,12 +133,11 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
   return (
     <main className={`intro ${exiting ? 'intro--exiting' : ''}`}>
       <header className="intro-header">
-        <img src="/assets/kixiz-logo_ce4a8d4a.png" alt="KIXIZZ Studio" className="intro-logo" />
         <SocialLinks />
       </header>
 
       <div className="intro-center">
-        <div className="intro-title">Kiki Zhang</div>
+        <img src="/assets/kixiz-logo_ce4a8d4a.png" alt="KIXIZZ Studio" className="intro-logo" />
         <button type="button" className="intro-enter" onClick={enter} aria-label="I'm Kiki, a designer based in London. Welcome to KIXIZZ studio. Click to explore the portfolio.">
           {lines.map((line, lineIndex) => (
             <span className="intro-line" key={lineIndex} aria-hidden="true">
