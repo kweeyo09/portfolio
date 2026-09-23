@@ -2,8 +2,8 @@ import { useLocation } from 'wouter';
 
 // ─── Design: dark elegant, Instrument Serif italic headings, Barlow body ───
 
-const REDBULL_THUMBNAIL = '/assets/0072_df56ea18.png';
-const KEYBOARD_THUMBNAIL = '/assets/0001_0dc6c9dd.png';
+const REDBULL_THUMBNAIL = '/assets/0072_df56ea18.webp';
+const KEYBOARD_THUMBNAIL = '/assets/0001_0dc6c9dd.webp';
 
 interface Project {
   id: number;

@@ -6,8 +6,8 @@
 import { useLocation } from 'wouter';
 
 const REDBULL_VIDEO = '/assets/redbull-v2_340151ae.mp4';
-const REDBULL_IMG_1 = '/assets/0072_df56ea18.png'; // three cans studio shot
-const REDBULL_IMG_2 = '/assets/0052_400eda6f.png'; // ice splash close-up
+const REDBULL_IMG_1 = '/assets/0072_df56ea18.webp'; // three cans studio shot
+const REDBULL_IMG_2 = '/assets/0052_400eda6f.webp'; // ice splash close-up
 
 export default function RedBullProject() {
   const [, setLocation] = useLocation();

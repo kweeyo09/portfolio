@@ -1,6 +1,6 @@
 import { useLocation } from 'wouter';
 
-const JELLYFLOWER_THUMB = '/assets/jellyflower_bf91d6d2.mp4';
+const JELLYFLOWER_THUMB = '/assets/jellyflower_bf91d6d2.webp';
 
 export default function ThreeDMotion() {
   const [, setLocation] = useLocation();
@@ -80,14 +80,11 @@ export default function ThreeDMotion() {
             (e.currentTarget as HTMLDivElement).style.borderColor = 'rgba(255,255,255,0.08)';
           }}
         >
-          {/* Video thumbnail — autoplay muted loop as preview */}
+          {/* Lightweight project preview */}
           <div style={{ width: '100%', aspectRatio: '16/9', overflow: 'hidden', lineHeight: 0 }}>
-            <video
+            <img
               src={JELLYFLOWER_THUMB}
-              autoPlay
-              muted
-              loop
-              playsInline
+              alt="Jelly Flower animation preview"
               style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
             />
           </div>

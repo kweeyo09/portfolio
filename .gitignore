@@ -7,6 +7,14 @@ dist/
 build/
 *.dist
 
+# Original portfolio images kept locally; optimized WebP files are deployed
+client/public/assets/0001_0dc6c9dd.png
+client/public/assets/0052_400eda6f.png
+client/public/assets/0064_b9b87608.png
+client/public/assets/0072_df56ea18.png
+client/public/assets/0119_ea94796b.png
+client/public/assets/jellyflower_bf91d6d2.mp4.png
+
 # Environment variables
 .env
 .env.local
