@@ -18,9 +18,11 @@ const JellyFlowerProject = lazy(() => import("./pages/JellyFlowerProject"));
 const Limelight = lazy(() => import("./pages/Limelight"));
 
 
-function StudioEntry({ introVisible }: { introVisible: boolean }) {
+function StudioEntry({ location }: { location: string }) {
   const [flowersReady, setFlowersReady] = useState(false);
+  const [showIntroOnFlowers, setShowIntroOnFlowers] = useState(location === "/flowers");
   const handleReady = useCallback(() => setFlowersReady(true), []);
+  const introVisible = location === "/" || showIntroOnFlowers;
 
   return (
     <>
@@ -31,7 +33,7 @@ function StudioEntry({ introVisible }: { introVisible: boolean }) {
       </div>
       {introVisible && (
         <div style={{ position: "fixed", inset: 0, zIndex: 2000 }}>
-          <Intro flowersReady={flowersReady} />
+          <Intro flowersReady={flowersReady} onEnterComplete={() => setShowIntroOnFlowers(false)} />
         </div>
       )}
     </>
@@ -41,7 +43,7 @@ function StudioEntry({ introVisible }: { introVisible: boolean }) {
 function Router() {
   const [location] = useLocation();
   if (location === "/" || location === "/flowers") {
-    return <StudioEntry introVisible={location === "/"} />;
+    return <StudioEntry location={location} />;
   }
 
   return (

@@ -18,7 +18,7 @@ const lines = [
 
 type Accent = 'designer' | 'studio' | null;
 
-export default function Intro({ flowersReady }: { flowersReady: boolean }) {
+export default function Intro({ flowersReady, onEnterComplete }: { flowersReady: boolean; onEnterComplete: () => void }) {
   const [, setLocation] = useLocation();
   const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
   const bodiesRef = useRef<Body[]>([]);
@@ -109,8 +109,12 @@ export default function Intro({ flowersReady }: { flowersReady: boolean }) {
     setExiting(true);
     const engine = engineRef.current;
     const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (!engine || reducedMotion) {
+    const completeEntry = () => {
+      onEnterComplete();
       setLocation('/flowers');
+    };
+    if (!engine || reducedMotion) {
+      completeEntry();
       return;
     }
     constraintsRef.current.forEach(constraint => Composite.remove(engine.world, constraint));
@@ -119,8 +123,8 @@ export default function Intro({ flowersReady }: { flowersReady: boolean }) {
       Body.setVelocity(body, { x: (Math.random() - 0.5) * 8, y: -5 - Math.random() * 4 });
       Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.23);
     });
-    window.setTimeout(() => setLocation('/flowers'), 1150);
-  }, [entryRequested, flowersReady, setLocation]);
+    window.setTimeout(completeEntry, 1150);
+  }, [entryRequested, flowersReady, onEnterComplete, setLocation]);
 
   const enter = () => setEntryRequested(true);
 
