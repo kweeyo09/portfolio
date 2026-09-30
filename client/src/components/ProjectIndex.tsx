@@ -46,13 +46,13 @@ function ProjectLink({ title, href }: Project) {
   );
 }
 
-function PhysicsText({ as: Tag, text }: { as: 'h1' | 'p'; text: string }) {
+function PhysicsParagraph({ text }: { text: string }) {
   const { letters, hoverHandlers } = useLetterPhysics(text);
   return (
-    <Tag {...hoverHandlers}>
+    <p {...hoverHandlers}>
       <span className="sr-only">{text}</span>
       <span aria-hidden="true">{letters}</span>
-    </Tag>
+    </p>
   );
 }
 
@@ -64,8 +64,8 @@ export default function ProjectIndex({ heading, description, projects }: Project
       <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>back</button>
       <div className="project-index__content">
         <header className="project-index__header">
-          <PhysicsText as="h1" text={heading.toLowerCase()} />
-          <PhysicsText as="p" text={description.toLowerCase()} />
+          <h1>{heading.toLowerCase()}</h1>
+          <PhysicsParagraph text={description.toLowerCase()} />
         </header>
         <nav className="project-index__list" aria-label={`${heading.toLowerCase()} projects`}>
           {projects.map(project => <ProjectLink key={project.href} {...project} />)}
