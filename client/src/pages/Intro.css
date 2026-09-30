@@ -7,6 +7,7 @@
   overflow: hidden;
   background: #050505;
   color: #f8f5ef;
+  cursor: pointer;
   transition: background-color 900ms ease;
 }
 
@@ -97,35 +98,30 @@
 }
 
 .intro-accent {
-  position: relative;
   display: inline-block;
   white-space: nowrap;
-  color: #f4d8e2;
-  transition: color 250ms ease, text-shadow 250ms ease;
+  color: #f5f5f5;
 }
 
-.intro-accent::after {
-  content: '';
-  position: absolute;
-  right: 0;
-  bottom: 0.06em;
-  left: 0;
-  height: 1px;
-  background: currentColor;
-  opacity: 0.6;
-  transition: opacity 250ms ease;
+.intro-accent .intro-letter,
+.intro-accent .intro-space {
+  --highlight: #504157;
+  background-color: var(--highlight);
+  /* covers sub-pixel seams between adjacent letter boxes */
+  box-shadow: 1px 0 0 var(--highlight), -1px 0 0 var(--highlight);
+  transition: background-color 200ms ease, box-shadow 200ms ease, opacity 350ms ease;
 }
 
-.intro-accent:hover {
-  color: #fff1f7;
-  text-shadow: 0 0 16px rgba(255, 177, 209, 0.55), 0 0 38px rgba(255, 177, 209, 0.28);
+.intro-accent .intro-space {
+  display: inline-block;
 }
 
-.intro-accent:hover::after {
-  opacity: 1;
+.intro-accent:hover .intro-letter,
+.intro-accent:hover .intro-space {
+  --highlight: #65526e;
 }
 
-.intro--exiting .intro-accent::after {
+.intro--exiting .intro-accent .intro-space {
   opacity: 0;
 }
 
@@ -164,5 +160,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro *, .intro *::after { transition-duration: 0.01ms !important; }
+  .intro * { transition-duration: 0.01ms !important; }
 }

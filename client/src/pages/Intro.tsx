@@ -48,7 +48,7 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
         const bounds = letter.getBoundingClientRect();
         const origin = origins[index];
         return Bodies.rectangle(origin.x, origin.y, Math.max(bounds.width, 8), Math.max(bounds.height, 16), {
-          frictionAir: 0.12,
+          frictionAir: 0.07,
           collisionFilter: { group: -1 },
         });
       });
@@ -56,8 +56,8 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
         pointA: origins[index],
         bodyB: body,
         length: 0,
-        stiffness: 0.07,
-        damping: 0.2,
+        stiffness: 0.05,
+        damping: 0.12,
       }));
       Composite.add(engine.world, [...bodiesRef.current, ...constraintsRef.current]);
     };
@@ -117,8 +117,8 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
     if (exitingRef.current) return;
     const body = bodiesRef.current[index];
     if (body) {
-      Body.setVelocity(body, { x: (Math.random() - 0.5) * 3.2, y: -2.4 - Math.random() * 1.3 });
-      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.08);
+      Body.setVelocity(body, { x: (Math.random() - 0.5) * 9, y: -6 - Math.random() * 4 });
+      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.35);
     }
   };
 
@@ -145,19 +145,22 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
     window.setTimeout(completeEntry, 1150);
   }, [entryRequested, flowersReady, onEnterComplete, setLocation]);
 
-  const enter = () => setEntryRequested(true);
+  const enter = (event: React.MouseEvent) => {
+    if ((event.target as HTMLElement).closest('a')) return;
+    setEntryRequested(true);
+  };
 
   let letterIndex = 0;
 
   return (
-    <main className={`intro ${exiting ? 'intro--exiting' : ''}`}>
+    <main className={`intro ${exiting ? 'intro--exiting' : ''}`} onClick={enter}>
       <header className="intro-header">
         <SocialLinks />
       </header>
 
       <div className="intro-center">
         <img src="/assets/kixiz-logo_ce4a8d4a.png" alt="KIXIZZ Studio" className="intro-logo" />
-        <button type="button" className="intro-enter" onClick={enter} aria-label="I'm Kiki, a designer based in London. Welcome to KIXIZZ studio. Click to explore the portfolio.">
+        <button type="button" className="intro-enter" aria-label="I'm Kiki, a designer based in London. Welcome to KIXIZZ studio. Click to explore the portfolio.">
           <span className="intro-text" aria-hidden="true"
             onPointerEnter={() => { resettingRef.current = false; }}
             onPointerLeave={() => { resettingRef.current = true; }}>
