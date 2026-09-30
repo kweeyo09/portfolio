@@ -66,6 +66,12 @@
   outline-offset: 12px;
 }
 
+.intro-text {
+  display: block;
+  width: fit-content;
+  margin-inline: auto;
+}
+
 .intro-line {
   display: block;
 }
@@ -90,34 +96,37 @@
   will-change: transform;
 }
 
-.intro-word--accent {
+.intro-accent {
+  position: relative;
+  display: inline-block;
+  white-space: nowrap;
   color: #f4d8e2;
   transition: color 250ms ease, text-shadow 250ms ease;
 }
 
-.intro-word--accent::after {
+.intro-accent::after {
   content: '';
   position: absolute;
   right: 0;
-  bottom: 0.03em;
+  bottom: 0.06em;
   left: 0;
   height: 1px;
   background: currentColor;
-  opacity: 0;
-  transform: scaleX(0.75);
-  transition: opacity 250ms ease, transform 250ms ease;
+  opacity: 0.6;
+  transition: opacity 250ms ease;
 }
 
-.intro-word--active,
-.intro-word--accent:hover {
+.intro-accent:hover {
   color: #fff1f7;
   text-shadow: 0 0 16px rgba(255, 177, 209, 0.55), 0 0 38px rgba(255, 177, 209, 0.28);
 }
 
-.intro-word--active::after,
-.intro-word--accent:hover::after {
+.intro-accent:hover::after {
   opacity: 1;
-  transform: scaleX(1);
+}
+
+.intro--exiting .intro-accent::after {
+  opacity: 0;
 }
 
 .intro-edge {

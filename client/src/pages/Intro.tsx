@@ -16,8 +16,6 @@ const lines = [
   ],
 ] as const;
 
-type Accent = 'designer' | 'studio' | null;
-
 export default function Intro({ flowersReady, onEnterComplete }: { flowersReady: boolean; onEnterComplete: () => void }) {
   const [, setLocation] = useLocation();
   const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
@@ -25,9 +23,9 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
   const constraintsRef = useRef<Constraint[]>([]);
   const engineRef = useRef<Engine | null>(null);
   const exitingRef = useRef(false);
+  const resettingRef = useRef(false);
   const [exiting, setExiting] = useState(false);
   const [entryRequested, setEntryRequested] = useState(false);
-  const [hoveredAccent, setHoveredAccent] = useState<Accent>(null);
 
   useEffect(() => {
     const engine = Engine.create();
@@ -67,6 +65,27 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
     const animate = () => {
       if (!active) return;
       Engine.update(engine, 1000 / 60);
+      if (resettingRef.current && !exitingRef.current) {
+        let settled = true;
+        bodiesRef.current.forEach((body, index) => {
+          const origin = origins[index];
+          if (!origin) return;
+          const dx = origin.x - body.position.x;
+          const dy = origin.y - body.position.y;
+          if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1 || Math.abs(body.angle) > 0.001) settled = false;
+          Body.setPosition(body, { x: body.position.x + dx * 0.18, y: body.position.y + dy * 0.18 });
+          Body.setAngle(body, body.angle * 0.82);
+          Body.setVelocity(body, { x: 0, y: 0 });
+          Body.setAngularVelocity(body, 0);
+        });
+        if (settled) {
+          bodiesRef.current.forEach((body, index) => {
+            if (origins[index]) Body.setPosition(body, origins[index]);
+            Body.setAngle(body, 0);
+          });
+          resettingRef.current = false;
+        }
+      }
       bodiesRef.current.forEach((body, index) => {
         const letter = lettersRef.current[index];
         const origin = origins[index];
@@ -139,27 +158,43 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
       <div className="intro-center">
         <img src="/assets/kixiz-logo_ce4a8d4a.png" alt="KIXIZZ Studio" className="intro-logo" />
         <button type="button" className="intro-enter" onClick={enter} aria-label="I'm Kiki, a designer based in London. Welcome to KIXIZZ studio. Click to explore the portfolio.">
-          {lines.map((line, lineIndex) => (
-            <span className="intro-line" key={lineIndex} aria-hidden="true">
-              {line.map((word, wordIndex) => {
+          <span className="intro-text" aria-hidden="true"
+            onPointerEnter={() => { resettingRef.current = false; }}
+            onPointerLeave={() => { resettingRef.current = true; }}>
+            {lines.map((line, lineIndex) => {
+              const groups = line.reduce<{ accent: string | null; words: string[] }[]>((result, word) => {
                 const accent = 'accent' in word ? word.accent : null;
-                return (
-                  <span key={`${lineIndex}-${wordIndex}`} className={`intro-word ${accent ? 'intro-word--accent' : ''} ${accent && hoveredAccent === accent ? 'intro-word--active' : ''}`}
-                    onPointerEnter={accent ? () => setHoveredAccent(accent) : undefined}
-                    onPointerLeave={accent ? () => setHoveredAccent(null) : undefined}>
-                    {Array.from(word.text).map(character => {
-                      const index = letterIndex++;
-                      return <span className="intro-letter" key={index} ref={element => { lettersRef.current[index] = element; }} onPointerEnter={() => jiggle(index)}>{character}</span>;
-                    })}
-                  </span>
-                );
-              }).reduce<React.ReactNode[]>((nodes, word, index) => {
-                if (index > 0) nodes.push(<span className="intro-space" key={`space-${index}`}> </span>);
-                nodes.push(word);
-                return nodes;
-              }, [])}
-            </span>
-          ))}
+                const last = result[result.length - 1];
+                if (accent && last?.accent === accent) last.words.push(word.text);
+                else result.push({ accent, words: [word.text] });
+                return result;
+              }, []);
+              const renderWord = (text: string, key: string) => (
+                <span key={key} className="intro-word">
+                  {Array.from(text).map(character => {
+                    const index = letterIndex++;
+                    return <span className="intro-letter" key={index} ref={element => { lettersRef.current[index] = element; }} onPointerEnter={() => jiggle(index)}>{character}</span>;
+                  })}
+                </span>
+              );
+              const withSpaces = (nodes: React.ReactNode[], prefix: string) => nodes.reduce<React.ReactNode[]>((result, node, index) => {
+                if (index > 0) result.push(<span className="intro-space" key={`${prefix}-space-${index}`}> </span>);
+                result.push(node);
+                return result;
+              }, []);
+              return (
+                <span className="intro-line" key={lineIndex}>
+                  {withSpaces(groups.map((group, groupIndex) => {
+                    const key = `${lineIndex}-${groupIndex}`;
+                    const words = group.words.map((text, wordIndex) => renderWord(text, `${key}-${wordIndex}`));
+                    return group.accent
+                      ? <span key={key} className="intro-accent">{withSpaces(words, key)}</span>
+                      : words[0];
+                  }), `${lineIndex}`)}
+                </span>
+              );
+            })}
+          </span>
         </button>
       </div>
 
