@@ -98,14 +98,31 @@
 }
 
 .intro-accent {
+  position: relative;
   display: inline-block;
   white-space: nowrap;
   color: #f5f5f5;
 }
 
+.intro-accent::after {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 0.06em;
+  left: 0;
+  height: 1px;
+  background: #f4d8e2;
+  opacity: 0.6;
+  transition: opacity 250ms ease;
+}
+
+.intro-accent:hover::after {
+  opacity: 1;
+}
+
 .intro-accent .intro-letter,
 .intro-accent .intro-space {
-  --highlight: #504157;
+  --highlight: #835266;
   background-color: var(--highlight);
   /* covers sub-pixel seams between adjacent letter boxes */
   box-shadow: 1px 0 0 var(--highlight), -1px 0 0 var(--highlight);
@@ -118,9 +135,10 @@
 
 .intro-accent:hover .intro-letter,
 .intro-accent:hover .intro-space {
-  --highlight: #65526e;
+  --highlight: #8c5a6e;
 }
 
+.intro--exiting .intro-accent::after,
 .intro--exiting .intro-accent .intro-space {
   opacity: 0;
 }
@@ -160,5 +178,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro * { transition-duration: 0.01ms !important; }
+  .intro *, .intro *::after { transition-duration: 0.01ms !important; }
 }
