@@ -1,6 +1,6 @@
-import { Fragment, useEffect, useRef, type MouseEvent } from 'react';
-import { Bodies, Body, Composite, Constraint, Engine } from 'matter-js';
+import { useEffect, useRef, type MouseEvent } from 'react';
 import { useLocation } from 'wouter';
+import { useLetterPhysics } from './useLetterPhysics';
 import './ProjectIndex.css';
 
 interface Project {
@@ -15,132 +15,44 @@ interface ProjectIndexProps {
 }
 
 function ProjectLink({ title, href }: Project) {
-  const displayTitle = title.toLowerCase();
   const [, setLocation] = useLocation();
-  const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
-  const bodiesRef = useRef<Body[]>([]);
-  const constraintsRef = useRef<Constraint[]>([]);
-  const engineRef = useRef<Engine | null>(null);
+  const { letters, hoverHandlers, scatter } = useLetterPhysics(title);
   const leavingRef = useRef(false);
   const timerRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    const engine = Engine.create();
-    engine.gravity.y = 0;
-    engineRef.current = engine;
-    let frame = 0;
-    let active = true;
-    let origins: { x: number; y: number }[] = [];
-
-    const rebuild = () => {
-      if (leavingRef.current) return;
-      Composite.clear(engine.world, false);
-      const letters = lettersRef.current.filter((letter): letter is HTMLSpanElement => Boolean(letter));
-      letters.forEach(letter => { letter.style.transform = ''; });
-      origins = letters.map(letter => {
-        const bounds = letter.getBoundingClientRect();
-        return { x: bounds.left + bounds.width / 2, y: bounds.top + bounds.height / 2 };
-      });
-      bodiesRef.current = letters.map((letter, index) => {
-        const bounds = letter.getBoundingClientRect();
-        return Bodies.rectangle(origins[index].x, origins[index].y, Math.max(bounds.width, 8), Math.max(bounds.height, 16), {
-          frictionAir: 0.09,
-          collisionFilter: { group: -1 },
-        });
-      });
-      constraintsRef.current = bodiesRef.current.map((body, index) => Constraint.create({
-        pointA: origins[index],
-        bodyB: body,
-        length: 0,
-        stiffness: 0.065,
-        damping: 0.14,
-      }));
-      Composite.add(engine.world, [...bodiesRef.current, ...constraintsRef.current]);
-    };
-
-    const animate = () => {
-      if (!active) return;
-      Engine.update(engine, 1000 / 60);
-      bodiesRef.current.forEach((body, index) => {
-        const letter = lettersRef.current[index];
-        const origin = origins[index];
-        if (letter && origin) {
-          letter.style.transform = `translate3d(${body.position.x - origin.x}px, ${body.position.y - origin.y}px, 0) rotate(${body.angle}rad)`;
-        }
-      });
-      frame = requestAnimationFrame(animate);
-    };
-
-    document.fonts.ready.then(() => {
-      if (!active) return;
-      rebuild();
-      animate();
-    });
-    window.addEventListener('resize', rebuild);
-
-    return () => {
-      active = false;
-      cancelAnimationFrame(frame);
-      window.removeEventListener('resize', rebuild);
-      Composite.clear(engine.world, false);
-      Engine.clear(engine);
-      engineRef.current = null;
-    };
-  }, [title]);
 
   useEffect(() => () => {
     if (timerRef.current !== null) window.clearTimeout(timerRef.current);
   }, []);
-
-  const jiggle = (index: number) => {
-    if (leavingRef.current) return;
-    const body = bodiesRef.current[index];
-    if (!body) return;
-    Body.setVelocity(body, { x: (Math.random() - 0.5) * 4.2, y: -3.2 - Math.random() * 1.8 });
-    Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.12);
-  };
-
-  const jiggleAll = () => bodiesRef.current.forEach((_, index) => jiggle(index));
 
   const openProject = (event: MouseEvent<HTMLAnchorElement>) => {
     if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
     event.preventDefault();
     if (leavingRef.current) return;
     leavingRef.current = true;
-
-    const engine = engineRef.current;
-    if (!engine) {
+    if (!scatter()) {
       setLocation(href);
       return;
     }
-    constraintsRef.current.forEach(constraint => Composite.remove(engine.world, constraint));
-    engine.gravity.y = 1.15;
-    bodiesRef.current.forEach(body => {
-      Body.setVelocity(body, { x: (Math.random() - 0.5) * 6, y: -4 - Math.random() * 3 });
-      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.17);
-    });
     timerRef.current = window.setTimeout(() => setLocation(href), 850);
   };
 
-  let letterIndex = 0;
   return (
-    <a className="project-index__link" href={href} onClick={openProject} onPointerEnter={jiggleAll} aria-label={`view ${displayTitle}`}>
-      <span className="project-index__title" aria-hidden="true">
-        {displayTitle.split(' ').map((word, wordIndex) => (
-          <Fragment key={`${word}-${wordIndex}`}>
-            {wordIndex > 0 && ' '}
-            <span className="project-index__word">
-              {Array.from(word).map(character => {
-                const index = letterIndex++;
-                return <span className="project-index__letter" key={index} ref={element => { lettersRef.current[index] = element; }} onPointerEnter={() => jiggle(index)}>{character}</span>;
-              })}
-            </span>
-          </Fragment>
-        ))}
+    <a className="project-index__link" href={href} onClick={openProject} {...hoverHandlers}>
+      <span className="project-index__title">
+        <span className="sr-only">{title}</span>
+        <span aria-hidden="true">{letters}</span>
       </span>
     </a>
+  );
+}
+
+function PhysicsText({ as: Tag, text }: { as: 'h1' | 'p'; text: string }) {
+  const { letters, hoverHandlers } = useLetterPhysics(text);
+  return (
+    <Tag {...hoverHandlers}>
+      <span className="sr-only">{text}</span>
+      <span aria-hidden="true">{letters}</span>
+    </Tag>
   );
 }
 
@@ -152,8 +64,8 @@ export default function ProjectIndex({ heading, description, projects }: Project
       <button type="button" className="project-index__back" onClick={() => setLocation('/flowers')}>back</button>
       <div className="project-index__content">
         <header className="project-index__header">
-          <h1>{heading.toLowerCase()}</h1>
-          <p>{description.toLowerCase()}</p>
+          <PhysicsText as="h1" text={heading.toLowerCase()} />
+          <PhysicsText as="p" text={description.toLowerCase()} />
         </header>
         <nav className="project-index__list" aria-label={`${heading.toLowerCase()} projects`}>
           {projects.map(project => <ProjectLink key={project.href} {...project} />)}

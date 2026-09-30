@@ -4,7 +4,6 @@
   background: #050505;
   color: #f8f5ef;
   font-family: 'Barlow', sans-serif;
-  text-transform: lowercase;
 }
 
 .project-index__back {
@@ -68,30 +67,39 @@
   padding: 8px 0;
   color: rgba(248, 245, 239, 0.78);
   text-decoration: none;
-  transition: color 250ms ease, text-shadow 250ms ease;
+  transition: color 250ms ease;
 }
 
 .project-index__link:hover,
 .project-index__link:focus-visible {
   color: #ffe3ee;
-  text-shadow: 0 0 20px rgba(255, 177, 209, 0.48);
 }
 
 .project-index__title {
-  font: italic 400 clamp(1.9rem, 3.2vw, 3rem)/1.15 'Instrument Serif', serif;
+  font: 400 clamp(1.9rem, 3.2vw, 3rem)/1.15 'Instrument Serif', serif;
   letter-spacing: 0.055em;
+  /* underline drawn as a background so it spans every wrapped line and the gaps between words */
+  background: linear-gradient(#f4d8e2, #f4d8e2) 0 100% / 0 1px no-repeat;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+  transition: background-size 300ms ease;
 }
 
-.project-index__word,
-.project-index__letter {
+.project-index__link:hover .project-index__title,
+.project-index__link:focus-visible .project-index__title {
+  background-size: 100% 1px;
+}
+
+.physics-word,
+.physics-letter {
   display: inline-block;
 }
 
-.project-index__word {
+.physics-word {
   white-space: nowrap;
 }
 
-.project-index__letter {
+.physics-letter {
   position: relative;
   will-change: transform;
 }
@@ -121,7 +129,8 @@
 
 @media (prefers-reduced-motion: reduce) {
   .project-index__back,
-  .project-index__link {
+  .project-index__link,
+  .project-index__title {
     transition-duration: 0.01ms;
   }
 }
