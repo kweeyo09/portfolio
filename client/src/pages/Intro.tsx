@@ -23,8 +23,7 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
   const constraintsRef = useRef<Constraint[]>([]);
   const engineRef = useRef<Engine | null>(null);
   const exitingRef = useRef(false);
-  const buzzingRef = useRef<number[]>([]);
-  const settleRef = useRef<(indices: number[]) => void>(() => {});
+  const resettingRef = useRef(false);
   const [exiting, setExiting] = useState(false);
   const [entryRequested, setEntryRequested] = useState(false);
 
@@ -35,14 +34,6 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
     let frame = 0;
     let active = true;
     let origins: { x: number; y: number }[] = [];
-    settleRef.current = indices => indices.forEach(index => {
-      const body = bodiesRef.current[index];
-      if (!body || !origins[index]) return;
-      Body.setPosition(body, origins[index]);
-      Body.setAngle(body, 0);
-      Body.setVelocity(body, { x: 0, y: 0 });
-      Body.setAngularVelocity(body, 0);
-    });
 
     const rebuild = () => {
       if (exitingRef.current) return;
@@ -57,7 +48,7 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
         const bounds = letter.getBoundingClientRect();
         const origin = origins[index];
         return Bodies.rectangle(origin.x, origin.y, Math.max(bounds.width, 8), Math.max(bounds.height, 16), {
-          frictionAir: 0.1,
+          frictionAir: 0.085,
           collisionFilter: { group: -1 },
         });
       });
@@ -65,8 +56,8 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
         pointA: origins[index],
         bodyB: body,
         length: 0,
-        stiffness: 0.06,
-        damping: 0.16,
+        stiffness: 0.055,
+        damping: 0.14,
       }));
       Composite.add(engine.world, [...bodiesRef.current, ...constraintsRef.current]);
     };
@@ -74,16 +65,26 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
     const animate = () => {
       if (!active) return;
       Engine.update(engine, 1000 / 60);
-      if (!exitingRef.current) {
-        buzzingRef.current.forEach(index => {
-          const body = bodiesRef.current[index];
+      if (resettingRef.current && !exitingRef.current) {
+        let settled = true;
+        bodiesRef.current.forEach((body, index) => {
           const origin = origins[index];
-          if (!body || !origin) return;
-          Body.setPosition(body, { x: origin.x + (Math.random() - 0.5) * 2.4, y: origin.y + (Math.random() - 0.5) * 2.4 });
-          Body.setAngle(body, (Math.random() - 0.5) * 0.06);
+          if (!origin) return;
+          const dx = origin.x - body.position.x;
+          const dy = origin.y - body.position.y;
+          if (Math.abs(dx) > 0.1 || Math.abs(dy) > 0.1 || Math.abs(body.angle) > 0.001) settled = false;
+          Body.setPosition(body, { x: body.position.x + dx * 0.18, y: body.position.y + dy * 0.18 });
+          Body.setAngle(body, body.angle * 0.82);
           Body.setVelocity(body, { x: 0, y: 0 });
           Body.setAngularVelocity(body, 0);
         });
+        if (settled) {
+          bodiesRef.current.forEach((body, index) => {
+            if (origins[index]) Body.setPosition(body, origins[index]);
+            Body.setAngle(body, 0);
+          });
+          resettingRef.current = false;
+        }
       }
       bodiesRef.current.forEach((body, index) => {
         const letter = lettersRef.current[index];
@@ -112,14 +113,13 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
     };
   }, []);
 
-  const startBuzz = (indices: number[]) => {
-    if (exitingRef.current || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    buzzingRef.current = indices;
-  };
-
-  const stopBuzz = (indices: number[]) => {
-    buzzingRef.current = buzzingRef.current.filter(index => !indices.includes(index));
-    if (!exitingRef.current) settleRef.current(indices);
+  const jiggle = (index: number) => {
+    if (exitingRef.current) return;
+    const body = bodiesRef.current[index];
+    if (body) {
+      Body.setVelocity(body, { x: (Math.random() - 0.5) * 6.5, y: -4.5 - Math.random() * 2.8 });
+      Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.24);
+    }
   };
 
   useEffect(() => {
@@ -161,7 +161,9 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
       <div className="intro-center">
         <img src="/assets/kixiz-logo_ce4a8d4a.png" alt="KIXIZZ Studio" className="intro-logo" />
         <button type="button" className="intro-enter" aria-label="I'm Kiki, a designer based in London. Welcome to KIXIZZ studio. Click to explore the portfolio.">
-          <span className="intro-text" aria-hidden="true">
+          <span className="intro-text" aria-hidden="true"
+            onPointerEnter={() => { resettingRef.current = false; }}
+            onPointerLeave={() => { resettingRef.current = true; }}>
             {lines.map((line, lineIndex) => {
               const groups = line.reduce<{ accent: string | null; words: string[] }[]>((result, word) => {
                 const accent = 'accent' in word ? word.accent : null;
@@ -170,17 +172,14 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
                 else result.push({ accent, words: [word.text] });
                 return result;
               }, []);
-              const renderWord = (text: string, key: string) => {
-                const letters = Array.from(text).map(character => ({ character, index: letterIndex++ }));
-                const indices = letters.map(letter => letter.index);
-                return (
-                  <span key={key} className="intro-word" onPointerEnter={() => startBuzz(indices)} onPointerLeave={() => stopBuzz(indices)}>
-                    {letters.map(({ character, index }) => (
-                      <span className="intro-letter" key={index} ref={element => { lettersRef.current[index] = element; }}>{character}</span>
-                    ))}
-                  </span>
-                );
-              };
+              const renderWord = (text: string, key: string) => (
+                <span key={key} className="intro-word">
+                  {Array.from(text).map(character => {
+                    const index = letterIndex++;
+                    return <span className="intro-letter" key={index} ref={element => { lettersRef.current[index] = element; }} onPointerEnter={() => jiggle(index)}>{character}</span>;
+                  })}
+                </span>
+              );
               const withSpaces = (nodes: React.ReactNode[], prefix: string) => nodes.reduce<React.ReactNode[]>((result, node, index) => {
                 if (index > 0) result.push(<span className="intro-space" key={`${prefix}-space-${index}`}> </span>);
                 result.push(node);
