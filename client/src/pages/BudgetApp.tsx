@@ -419,7 +419,7 @@ function ColorPalette() {
   return (
     <div>
       <h2 style={{ fontFamily: "'Caveat', cursive", fontSize: 28, fontWeight: 700, color: '#fff', marginBottom: 8 }}>Color Palette</h2>
-      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 24, fontWeight: 300 }}>Design tokens extracted from the Budget app</p>
+      <p style={{ fontSize: 13, color: 'rgba(255,255,255,0.5)', marginBottom: 24, fontWeight: 300 }}>Design tokens extracted from the Budgeting app</p>
       <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: 16 }}>
         {swatches.map(s => (
           <div key={s.name} style={{ borderRadius: 12, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.3)' }}>

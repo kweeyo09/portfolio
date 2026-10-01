@@ -16,6 +16,9 @@ const RedBullProject = lazy(() => import("./pages/RedBullProject"));
 const KeyboardProject = lazy(() => import("./pages/KeyboardProject"));
 const JellyFlowerProject = lazy(() => import("./pages/JellyFlowerProject"));
 const Limelight = lazy(() => import("./pages/Limelight"));
+const FocusNest = lazy(() => import("./pages/FocusNest"));
+const CCNLondon = lazy(() => import("./pages/CCNLondon"));
+const ArmaniProject = lazy(() => import("./pages/ArmaniProject"));
 
 
 function StudioEntry({ introVisible, onEnterComplete }: { introVisible: boolean; onEnterComplete: () => void }) {
@@ -52,8 +55,11 @@ function Router({ initialPath, introDismissed, onEnterComplete }: { initialPath:
       <Route path={"/product-design"} component={ProductDesign} />
       <Route path={"/budget-app"} component={BudgetApp} />
       <Route path={"/limelight"} component={Limelight} />
+      <Route path={"/focusnest"} component={FocusNest} />
+      <Route path={"/ccn-london"} component={CCNLondon} />
       <Route path={"/product-design/redbull"} component={RedBullProject} />
       <Route path={"/product-design/keyboard"} component={KeyboardProject} />
+      <Route path={"/product-design/armani"} component={ArmaniProject} />
       <Route path={"/3d-motion/jellyflower"} component={JellyFlowerProject} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}

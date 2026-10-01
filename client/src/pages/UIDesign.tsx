@@ -1,7 +1,9 @@
 import ProjectIndex from '../components/ProjectIndex';
 
 const projects = [
-  { title: 'Budget App', href: '/budget-app' },
+  { title: 'Budgeting App', href: '/budget-app' },
+  { title: 'FocusNest', href: '/focusnest' },
+  { title: 'CCN London', href: '/ccn-london' },
   { title: 'Limelight', href: '/limelight' },
 ];
 

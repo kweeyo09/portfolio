@@ -3,6 +3,7 @@ import ProjectIndex from '../components/ProjectIndex';
 const projects = [
   { title: 'Red Bull', href: '/product-design/redbull' },
   { title: 'Keyboard Commercial', href: '/product-design/keyboard' },
+  { title: 'Armani Perfume Campaign', href: '/product-design/armani' },
 ];
 
 export default function ProductDesign() {
