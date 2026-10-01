@@ -1,19 +1,19 @@
 /**
  * Armani Perfume Campaign — Product Design Case Study
- * Layout: optional full-bleed video hero → project info → render stills
+ * Stills only (no video). Layout: full-bleed hero still → project info →
+ * remaining stills stacked.
  *
- * Assets are not in the repo yet. To publish them, drop the files into
- * client/public/assets and fill in HERO_VIDEO / MEDIA below — the page
- * swaps out of its placeholder state automatically.
+ * To publish the visuals, copy them in with the hash-naming helper:
+ *   bash scripts/add-assets.sh armani <your-files...>
+ * then paste its output into MEDIA below. The page leaves its placeholder
+ * state as soon as MEDIA is non-empty.
  */
 
 import { useLocation } from 'wouter';
 
-// e.g. '/assets/armani-campaign_abc12345.mp4'
-const HERO_VIDEO: string | null = null;
-
-// e.g. [{ src: '/assets/armani-01_abc12345.webp', alt: 'Armani — bottle studio render' }]
 const MEDIA: { src: string; alt: string }[] = [];
+
+const [hero, ...rest] = MEDIA;
 
 export default function ArmaniProject() {
   const [, setLocation] = useLocation();
@@ -82,15 +82,12 @@ export default function ArmaniProject() {
         </span>
       </div>
 
-      {/* ── HERO VIDEO ── */}
-      {HERO_VIDEO && (
+      {/* ── HERO STILL ── */}
+      {hero && (
         <div style={{ width: '100%', position: 'relative', background: '#000', lineHeight: 0 }}>
-          <video
-            src={HERO_VIDEO}
-            autoPlay
-            loop
-            playsInline
-            controls
+          <img
+            src={hero.src}
+            alt={hero.alt}
             style={{ width: '100%', display: 'block', maxHeight: '100vh', objectFit: 'cover' }}
           />
           <div
@@ -112,7 +109,7 @@ export default function ArmaniProject() {
         style={{
           maxWidth: '900px',
           margin: '0 auto',
-          padding: HERO_VIDEO ? '60px 40px 40px' : '160px 40px 40px',
+          padding: hero ? '60px 40px 40px' : '160px 40px 40px',
         }}
       >
         <p
@@ -154,7 +151,7 @@ export default function ArmaniProject() {
         </p>
       </div>
 
-      {/* ── RENDERS ── */}
+      {/* ── STILLS ── */}
       <div
         style={{
           maxWidth: '1400px',
@@ -166,7 +163,7 @@ export default function ArmaniProject() {
         }}
       >
         {MEDIA.length > 0 ? (
-          MEDIA.map((item) => (
+          rest.map((item) => (
             <div
               key={item.src}
               style={{ width: '100%', borderRadius: '8px', overflow: 'hidden', lineHeight: 0 }}
@@ -174,6 +171,7 @@ export default function ArmaniProject() {
               <img
                 src={item.src}
                 alt={item.alt}
+                loading="lazy"
                 style={{ width: '100%', display: 'block', objectFit: 'cover' }}
               />
             </div>

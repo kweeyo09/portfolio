@@ -4,6 +4,11 @@ import { useLocation } from 'wouter';
 import SocialLinks from '../components/SocialLinks';
 import './Intro.css';
 
+// The exit fade on .intro-text (Intro.css) finishes at 420ms delay + 760ms,
+// so hold the overlay a beat past that before unmounting — otherwise the
+// letters are cut off mid-fade.
+const EXIT_UNMOUNT_MS = 1250;
+
 const lines = [
   [
     { text: "I'm" }, { text: 'Kiki,' }, { text: 'a' },
@@ -142,7 +147,7 @@ export default function Intro({ flowersReady, onEnterComplete }: { flowersReady:
       Body.setVelocity(body, { x: (Math.random() - 0.5) * 8, y: -5 - Math.random() * 4 });
       Body.setAngularVelocity(body, (Math.random() - 0.5) * 0.23);
     });
-    window.setTimeout(completeEntry, 1150);
+    window.setTimeout(completeEntry, EXIT_UNMOUNT_MS);
   }, [entryRequested, flowersReady, onEnterComplete, setLocation]);
 
   const enter = (event: React.MouseEvent) => {

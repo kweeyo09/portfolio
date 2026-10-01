@@ -11,21 +11,18 @@ export default function FocusNest() {
     <div style={{ width: '100vw', height: '100vh', background: '#000', position: 'relative' }}>
       {/* Back button */}
       <button
-        className="liquid-glass"
         onClick={() => setLocation('/ui-design')}
         style={{
-          position: 'fixed', top: 32, left: 32,
-          borderRadius: 8, color: '#fff', fontFamily: "'Barlow', sans-serif",
-          fontSize: '0.75rem', letterSpacing: '0.15em', padding: '8px 16px',
-          transition: 'all 0.3s ease', zIndex: 100, fontWeight: '400',
-          cursor: 'pointer',
+          position: 'fixed', bottom: 32, left: 32,
+          border: 'none', borderRadius: 8,
+          background: '#000', color: '#fff',
+          fontFamily: "'Barlow', sans-serif",
+          fontSize: '0.75rem', letterSpacing: '0.15em', padding: '10px 18px',
+          transition: 'opacity 0.3s ease', zIndex: 100, fontWeight: '400',
+          cursor: 'pointer', opacity: 0.85,
         }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.2), 0 0 12px rgba(255,255,255,0.08)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.1)';
-        }}
+        onMouseEnter={(e) => { e.currentTarget.style.opacity = '1'; }}
+        onMouseLeave={(e) => { e.currentTarget.style.opacity = '0.85'; }}
       >
         Back
       </button>

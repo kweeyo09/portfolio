@@ -171,6 +171,15 @@
   pointer-events: none;
 }
 
+/* Exit: the letters crumble under gravity first, then fade off, so the
+   overlay never cuts them out mid-fall at full opacity. The delay lets the
+   tumble read on its own; the fade lands just before Intro.tsx unmounts
+   (see EXIT_UNMOUNT_MS there — keep the two in step). */
+.intro--exiting .intro-text {
+  opacity: 0;
+  transition: opacity 760ms cubic-bezier(0.4, 0, 0.6, 1) 420ms;
+}
+
 @media (max-width: 600px) {
   .intro-center { width: min(90vw, 460px); }
   .intro-enter { font-size: clamp(1.05rem, 4.1vw, 1.35rem); line-height: 1.48; }
@@ -178,5 +187,5 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .intro *, .intro *::after { transition-duration: 0.01ms !important; }
+  .intro *, .intro *::after { transition-duration: 0.01ms !important; transition-delay: 0ms !important; }
 }
