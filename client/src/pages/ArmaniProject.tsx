@@ -15,7 +15,7 @@ const MEDIA: { src: string; alt: string }[] = [
   { src: '/assets/armani-01_dba33603.webp', alt: "Emporio Armani Because It's You — bottle and orchid on a rose-pink set" },
   { src: '/assets/armani-02_6bf76acc.webp', alt: "Emporio Armani Because It's You — vertical composition with orchid stem" },
   { src: '/assets/armani-03_aba8539c.webp', alt: "Emporio Armani Because It's You — bottle with a dried flower bouquet" },
-  { src: '/assets/armani-04_36459b45.webp', alt: 'Emporio Armani Stronger With You Intensely — amber bottle with dried flowers' },
+  { src: '/assets/armani-04_16b0e263.webp', alt: 'Emporio Armani Stronger With You — amber bottle with orchid stem on oxblood' },
 ];
 
 const [hero, ...rest] = MEDIA;
@@ -151,9 +151,9 @@ export default function ArmaniProject() {
           }}
         >
           A campaign study for Emporio Armani fragrance, rendered in Blender.
-          Because It's You and Stronger With You Intensely are set against
-          rose and oxblood backdrops with orchid and dried florals — a study
-          in glass refraction, liquid tint, and soft directional light.
+          Because It's You and Stronger With You are set against rose and
+          oxblood backdrops with orchid and dried florals — a study in glass
+          refraction, liquid tint, and soft directional light.
         </p>
       </div>
 
