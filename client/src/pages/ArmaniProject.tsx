@@ -11,7 +11,12 @@
 
 import { useLocation } from 'wouter';
 
-const MEDIA: { src: string; alt: string }[] = [];
+const MEDIA: { src: string; alt: string }[] = [
+  { src: '/assets/armani-01_dba33603.webp', alt: "Emporio Armani Because It's You — bottle and orchid on a rose-pink set" },
+  { src: '/assets/armani-02_6bf76acc.webp', alt: "Emporio Armani Because It's You — vertical composition with orchid stem" },
+  { src: '/assets/armani-03_aba8539c.webp', alt: "Emporio Armani Because It's You — bottle with a dried flower bouquet" },
+  { src: '/assets/armani-04_36459b45.webp', alt: 'Emporio Armani Stronger With You Intensely — amber bottle with dried flowers' },
+];
 
 const [hero, ...rest] = MEDIA;
 
@@ -145,9 +150,10 @@ export default function ArmaniProject() {
             maxWidth: '640px',
           }}
         >
-          A product campaign study for Armani fragrance — exploring glass
-          refraction, liquid tint, and the restrained lighting language of
-          luxury perfume advertising.
+          A campaign study for Emporio Armani fragrance, rendered in Blender.
+          Because It's You and Stronger With You Intensely are set against
+          rose and oxblood backdrops with orchid and dried florals — a study
+          in glass refraction, liquid tint, and soft directional light.
         </p>
       </div>
 
@@ -166,13 +172,27 @@ export default function ArmaniProject() {
           rest.map((item) => (
             <div
               key={item.src}
-              style={{ width: '100%', borderRadius: '8px', overflow: 'hidden', lineHeight: 0 }}
+              style={{
+                width: '100%',
+                display: 'flex',
+                justifyContent: 'center',
+                borderRadius: '8px',
+                overflow: 'hidden',
+                lineHeight: 0,
+              }}
             >
               <img
                 src={item.src}
                 alt={item.alt}
                 loading="lazy"
-                style={{ width: '100%', display: 'block', objectFit: 'cover' }}
+                style={{
+                  maxWidth: '100%',
+                  maxHeight: '88vh',
+                  width: 'auto',
+                  height: 'auto',
+                  display: 'block',
+                  borderRadius: '8px',
+                }}
               />
             </div>
           ))
