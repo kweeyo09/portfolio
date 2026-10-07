@@ -1,5 +1,5 @@
 /**
- * Armani Perfume Campaign — Product Design Case Study
+ * Armani Perfume Campaign — 3D & Motion Case Study
  * Stills only (no video). Layout: full-bleed hero still → project info →
  * remaining stills stacked.
  *
@@ -52,7 +52,7 @@ export default function ArmaniProject() {
       >
         <button
           className="liquid-glass"
-          onClick={() => setLocation('/product-design')}
+          onClick={() => setLocation('/3d-motion')}
           style={{
             borderRadius: 8,
             color: '#fff',
@@ -83,7 +83,7 @@ export default function ArmaniProject() {
             fontWeight: '300',
           }}
         >
-          PRODUCT DESIGN · CASE STUDY
+          3D & MOTION · CASE STUDY
         </span>
       </div>
 

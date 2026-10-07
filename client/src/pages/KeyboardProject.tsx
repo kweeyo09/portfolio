@@ -1,5 +1,5 @@
 /**
- * Keyboard Commercial — Product Design Case Study
+ * Keyboard Commercial — 3D & Motion Case Study
  * Layout: full-bleed video hero → three render stills below
  */
 
@@ -42,7 +42,7 @@ export default function KeyboardProject() {
       >
         <button
           className="liquid-glass"
-          onClick={() => setLocation('/product-design')}
+          onClick={() => setLocation('/3d-motion')}
           style={{
             borderRadius: 8,
             color: '#fff',
@@ -73,7 +73,7 @@ export default function KeyboardProject() {
             fontWeight: '300',
           }}
         >
-          PRODUCT DESIGN · CASE STUDY
+          3D & MOTION · CASE STUDY
         </span>
       </div>
 

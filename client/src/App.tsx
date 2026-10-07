@@ -2,7 +2,7 @@ import { lazy, Suspense, useCallback, useState } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Route, Switch, useLocation } from "wouter";
+import { Redirect, Route, Switch, useLocation } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import Intro from "./pages/Intro";
@@ -10,7 +10,9 @@ import Intro from "./pages/Intro";
 const Home = lazy(() => import("./pages/Home"));
 const UIDesign = lazy(() => import("./pages/UIDesign"));
 const ThreeDMotion = lazy(() => import("./pages/ThreeDMotion"));
-const ProductDesign = lazy(() => import("./pages/ProductDesign"));
+const GraphicCampaign = lazy(() => import("./pages/GraphicCampaign"));
+const GraphicCampaignProject = lazy(() => import("./pages/GraphicCampaignProject"));
+const PeopleRunningProject = lazy(() => import("./pages/PeopleRunningProject"));
 const BudgetApp = lazy(() => import("./pages/BudgetApp"));
 const RedBullProject = lazy(() => import("./pages/RedBullProject"));
 const KeyboardProject = lazy(() => import("./pages/KeyboardProject"));
@@ -52,7 +54,10 @@ function Router({ initialPath, introDismissed, onEnterComplete }: { initialPath:
     <Switch>
       <Route path={"/ui-design"} component={UIDesign} />
       <Route path={"/3d-motion"} component={ThreeDMotion} />
-      <Route path={"/product-design"} component={ProductDesign} />
+      <Route path={"/graphic-campaign"} component={GraphicCampaign} />
+      <Route path={"/graphic-campaign/:slug"} component={GraphicCampaignProject} />
+      {/* Product design was merged into 3D & Motion; keep old links working */}
+      <Route path={"/product-design"}><Redirect to="/3d-motion" replace /></Route>
       <Route path={"/budget-app"} component={BudgetApp} />
       <Route path={"/limelight"} component={Limelight} />
       <Route path={"/focusnest"} component={FocusNest} />
@@ -61,6 +66,7 @@ function Router({ initialPath, introDismissed, onEnterComplete }: { initialPath:
       <Route path={"/product-design/keyboard"} component={KeyboardProject} />
       <Route path={"/product-design/armani"} component={ArmaniProject} />
       <Route path={"/3d-motion/jellyflower"} component={JellyFlowerProject} />
+      <Route path={"/3d-motion/people-running"} component={PeopleRunningProject} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
