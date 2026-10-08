@@ -53,10 +53,10 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
   {
     slug: 'brita',
     title: 'Brita × AllTrails',
-    eyebrow: 'Campaign Concept · Brita',
+    eyebrow: 'Live Brief · IRIS Worldwide',
     description:
       'A campaign concept pairing Brita with AllTrails to take filtered water outdoors — a co-branded identity, a month-long "Brita in Nature" content calendar of social posts, collabs and hiking events, and "Brita on the go" social creative for the filter bottle.',
-    note: 'Competition brief response. Not commissioned by or affiliated with Brita or AllTrails.',
+    note: 'Live brief from IRIS Worldwide — our team won 1st place. Not commissioned by or affiliated with Brita or AllTrails.',
     layout: 'grid',
     media: [
       { src: '/assets/brita-01_3e607192.webp', alt: 'Brita × AllTrails co-branded mark with a mountain illustration' },
