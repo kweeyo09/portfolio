@@ -636,6 +636,17 @@ export default function Home() {
           0%, 100% { transform: translateY(0); opacity: 1; }
           50% { transform: translateY(6px); opacity: 0.3; }
         }
+        @keyframes doodle-draw { to { stroke-dashoffset: 0; } }
+        @keyframes doodle-fade { to { opacity: 0.85; } }
+        .github-doodle path {
+          stroke-dasharray: 1; stroke-dashoffset: 1;
+          animation: doodle-draw 0.7s ease-out 1.4s forwards;
+        }
+        .github-doodle-text { opacity: 0; animation: doodle-fade 0.6s ease-out 1.1s forwards; }
+        @media (prefers-reduced-motion: reduce) {
+          .github-doodle path { animation: none; stroke-dashoffset: 0; }
+          .github-doodle-text { animation: none; opacity: 0.85; }
+        }
       `}</style>
 
       {/* Studio mark */}
@@ -659,6 +670,31 @@ export default function Home() {
         position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 'max(16px, env(safe-area-inset-right))',
       }}>
         <SocialLinks />
+
+        {/* Handwritten note pointing up at the GitHub icon */}
+        <div aria-hidden="true" style={{ pointerEvents: 'none' }}>
+          <svg
+            className="github-doodle"
+            width="44" height="46" viewBox="0 0 44 46"
+            fill="none" stroke="#f8f5ef" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
+            style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 61, opacity: 0.85 }}
+          >
+            <path pathLength={1} d="M5 43 C 9 30, 18 16, 37 6" />
+            <path pathLength={1} d="M27 5.5 L37 6 L31.5 14.5" />
+          </svg>
+          <span
+            className="github-doodle-text"
+            style={{
+              position: 'absolute', top: 'calc(100% + 40px)', right: 102,
+              whiteSpace: 'nowrap', color: '#f8f5ef',
+              fontFamily: "'Caveat', cursive", fontWeight: 600,
+              fontSize: 'clamp(1.15rem, 3.6vw, 1.45rem)', lineHeight: 1,
+              transform: 'rotate(-5deg)', transformOrigin: 'right center',
+            }}
+          >
+            more fun stuff here
+          </span>
+        </div>
       </div>
 
       {/* NEXT button - bottom right */}
