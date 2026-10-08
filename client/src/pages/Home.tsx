@@ -25,21 +25,21 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 /* ── CDN URLS ──────────────────────────────────────────────────── */
 const FLOWER_URLS = [
   '/assets/baihe_4774bde5.glb',
-  '/assets/anthurium_f0a39f13.glb',
   '/assets/lotus_f4ee305b.glb',
+  '/assets/anthurium_f0a39f13.glb',
   '/assets/pomegranate_59701679.glb',
   '/assets/poppy_c3f1f0b0.glb',
 ];
 
 // Display only 3 flowers with new names (keep all GLBs for later)
-const FLOWER_NAMES = ['百合', '花烛', '石榴花'];
-const FLOWER_EN    = ['UI/UX design', '3D & Motion', 'Graphic & Campaign'];
+const FLOWER_NAMES = ['百合', '石榴花', '花烛'];
+const FLOWER_EN    = ['UI/UX design', 'Graphic & Campaign', '3D & Motion'];
 
 // Fallback colours if texture fails
 const FLOWER_FALLBACK: [number,number,number][] = [
   [0.80, 0.48, 0.58],  // lily: dusty rose
-  [0.85, 0.15, 0.20],  // anthurium: red
   [0.85, 0.20, 0.15],  // pomegranate: deep red
+  [0.85, 0.15, 0.20],  // anthurium: red
 ];
 
 
@@ -500,7 +500,7 @@ export default function Home() {
     renderer.domElement.addEventListener('touchend', onTouchEnd, { passive: true });
 
     /* ── CANVAS CLICK / TAP: scatter particles ── */
-    const portfolioRoutes = ['/ui-design', '/3d-motion', '/graphic-campaign'];
+    const portfolioRoutes = ['/ui-design', '/graphic-campaign', '/3d-motion'];
     const onCanvasClick = () => {
       const f = flowers[activeIdx];
       if (f.targetProgress > 0.5) {
