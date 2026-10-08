@@ -1,18 +1,16 @@
-import { lazy, Suspense, useCallback, useState } from "react";
+import { lazy, Suspense } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
-import { Redirect, Route, Switch, useLocation } from "wouter";
+import { Redirect, Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
-import Intro from "./pages/Intro";
 
 const Home = lazy(() => import("./pages/Home"));
 const UIDesign = lazy(() => import("./pages/UIDesign"));
 const ThreeDMotion = lazy(() => import("./pages/ThreeDMotion"));
 const GraphicCampaign = lazy(() => import("./pages/GraphicCampaign"));
 const GraphicCampaignProject = lazy(() => import("./pages/GraphicCampaignProject"));
-const PeopleRunningProject = lazy(() => import("./pages/PeopleRunningProject"));
 const BudgetApp = lazy(() => import("./pages/BudgetApp"));
 const RedBullProject = lazy(() => import("./pages/RedBullProject"));
 const KeyboardProject = lazy(() => import("./pages/KeyboardProject"));
@@ -23,35 +21,11 @@ const CCNLondon = lazy(() => import("./pages/CCNLondon"));
 const ArmaniProject = lazy(() => import("./pages/ArmaniProject"));
 
 
-function StudioEntry({ introVisible, onEnterComplete }: { introVisible: boolean; onEnterComplete: () => void }) {
-  const [flowersReady, setFlowersReady] = useState(false);
-  const handleReady = useCallback(() => setFlowersReady(true), []);
-
-  return (
-    <>
-      <div inert={introVisible}>
-        <Suspense fallback={null}>
-          <Home active={!introVisible} onReady={handleReady} />
-        </Suspense>
-      </div>
-      {introVisible && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 2000 }}>
-          <Intro flowersReady={flowersReady} onEnterComplete={onEnterComplete} />
-        </div>
-      )}
-    </>
-  );
-}
-
-function Router({ initialPath, introDismissed, onEnterComplete }: { initialPath: string; introDismissed: boolean; onEnterComplete: () => void }) {
-  const [location] = useLocation();
-  if (location === "/" || location === "/flowers") {
-    const introVisible = !introDismissed && (location === "/" || initialPath === "/flowers");
-    return <StudioEntry introVisible={introVisible} onEnterComplete={onEnterComplete} />;
-  }
-
+function Router() {
   return (
     <Switch>
+      <Route path={"/"} component={Home} />
+      <Route path={"/flowers"} component={Home} />
       <Route path={"/ui-design"} component={UIDesign} />
       <Route path={"/3d-motion"} component={ThreeDMotion} />
       <Route path={"/graphic-campaign"} component={GraphicCampaign} />
@@ -66,7 +40,7 @@ function Router({ initialPath, introDismissed, onEnterComplete }: { initialPath:
       <Route path={"/product-design/keyboard"} component={KeyboardProject} />
       <Route path={"/product-design/armani"} component={ArmaniProject} />
       <Route path={"/3d-motion/jellyflower"} component={JellyFlowerProject} />
-      <Route path={"/3d-motion/people-running"} component={PeopleRunningProject} />
+      <Route path={"/3d-motion/people-running"}><Redirect to="/3d-motion" replace /></Route>
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -80,10 +54,6 @@ function Router({ initialPath, introDismissed, onEnterComplete }: { initialPath:
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
-  const [initialPath] = useState(() => window.location.pathname);
-  const [introDismissed, setIntroDismissed] = useState(false);
-  const handleEnterComplete = useCallback(() => setIntroDismissed(true), []);
-
   return (
     <ErrorBoundary>
       <ThemeProvider
@@ -93,7 +63,7 @@ function App() {
         <TooltipProvider>
           <Toaster />
           <Suspense fallback={null}>
-            <Router initialPath={initialPath} introDismissed={introDismissed} onEnterComplete={handleEnterComplete} />
+            <Router />
           </Suspense>
         </TooltipProvider>
       </ThemeProvider>

@@ -16,8 +16,7 @@
  * (avoids UV island seam bleed that causes wrong colours).
  */
 
-import { useEffect, useRef, useState } from 'react';
-import ResumeModal from '../components/ResumeModal';
+import { useEffect, useRef } from 'react';
 import SocialLinks from '../components/SocialLinks';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
@@ -316,14 +315,9 @@ async function buildParticles(
 }
 
 /* ── MAIN COMPONENT ─────────────────────────────────────────────── */
-export default function Home({ active = true, onReady }: { active?: boolean; onReady?: () => void }) {
-  const [showResume, setShowResume] = useState(false);
+export default function Home() {
   const mountRef      = useRef<HTMLDivElement>(null);
   const labelRef      = useRef<HTMLDivElement>(null);
-  const activeRef     = useRef(active);
-  const onReadyRef    = useRef(onReady);
-  activeRef.current = active;
-  onReadyRef.current = onReady;
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -377,17 +371,6 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
 
     /* ── LOAD ALL FLOWERS ── */
     const loader = new GLTFLoader();
-    let loadedCount = 0;
-    let readySignaled = false;
-    let readyFrame = 0;
-    const markLoaded = (idx: number) => {
-      loadedCount++;
-      if (!readySignaled && (idx === 0 || loadedCount === N_FLOWERS)) {
-        readySignaled = true;
-        readyFrame = requestAnimationFrame(() => onReadyRef.current?.());
-      }
-    };
-
     const loadFlower = (url: string, idx: number, fallback: [number,number,number]) => {
       loader.load(url, async (gltf) => {
         try {
@@ -420,12 +403,9 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
           updateLabel();
         } catch (err) {
           console.error(`[LOAD] Failed: ${FLOWER_NAMES[idx]}`, err);
-        } finally {
-          markLoaded(idx);
         }
       }, undefined, (err) => {
         console.error(`[LOAD] Failed: ${FLOWER_NAMES[idx]}`, err);
-        markLoaded(idx);
       });
     };
 
@@ -467,7 +447,6 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
 
     /* ── KEYBOARD FALLBACK ── */
     const onKey = (e: KeyboardEvent) => {
-      if (!activeRef.current) return;
       if (e.code === 'Space') {
         e.preventDefault();
         const f = flowers[activeIdx];
@@ -485,7 +464,6 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
     /* ── MOUSE WHEEL: cycle flowers ── */
     let wheelCooldown = 0;
     const onWheel = (e: WheelEvent) => {
-      if (!activeRef.current) return;
       // Only cycle if not zooming (ctrl key = pinch-zoom on trackpad)
       if (e.ctrlKey) return;
       const now = Date.now();
@@ -501,12 +479,10 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
     let touchStartY = 0;
     let touchCooldown = 0;
     const onTouchStart = (e: TouchEvent) => {
-      if (!activeRef.current) return;
       touchStartX = e.touches[0].clientX;
       touchStartY = e.touches[0].clientY;
     };
     const onTouchEnd = (e: TouchEvent) => {
-      if (!activeRef.current) return;
       const touchEndX = e.changedTouches[0].clientX;
       const touchEndY = e.changedTouches[0].clientY;
       const deltaX = touchEndX - touchStartX;
@@ -526,7 +502,6 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
     /* ── CANVAS CLICK / TAP: scatter particles ── */
     const portfolioRoutes = ['/ui-design', '/3d-motion', '/graphic-campaign'];
     const onCanvasClick = () => {
-      if (!activeRef.current) return;
       const f = flowers[activeIdx];
       if (f.targetProgress > 0.5) {
         f.targetProgress = 0;
@@ -586,7 +561,6 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
     /* ── CLEANUP ── */
     return () => {
       cancelAnimationFrame(raf);
-      cancelAnimationFrame(readyFrame);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
       renderer.domElement.removeEventListener('wheel', onWheel);
@@ -680,29 +654,11 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
         />
       </div>
 
-      {/* Social profiles and résumé */}
+      {/* Social profiles */}
       <div style={{
         position: 'absolute', top: 'max(16px, env(safe-area-inset-top))', right: 'max(16px, env(safe-area-inset-right))',
-        display: 'flex', gap: 'clamp(8px, 3vw, 24px)', flexWrap: 'wrap', justifyContent: 'flex-end',
       }}>
         <SocialLinks />
-        <button
-          className="liquid-glass"
-          onClick={() => setShowResume(true)}
-          style={{
-            borderRadius: 8, color: '#fff', fontFamily: "'Barlow', sans-serif",
-            fontSize: 'clamp(0.6rem, 2vw, 0.75rem)', letterSpacing: '0.15em', padding: 'clamp(6px, 1.5vw, 8px) clamp(10px, 2.5vw, 16px)',
-            cursor: 'pointer', transition: 'all 0.3s ease', fontWeight: '400',
-          }}
-          onMouseEnter={(e) => {
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.2), 0 0 12px rgba(255,255,255,0.08)';
-          }}
-          onMouseLeave={(e) => {
-            e.currentTarget.style.boxShadow = 'inset 0 1px 1px rgba(255,255,255,0.1)';
-          }}
-        >
-          RESUME
-        </button>
       </div>
 
       {/* NEXT button - bottom right */}
@@ -737,9 +693,6 @@ export default function Home({ active = true, onReady }: { active?: boolean; onR
       >
          NEXT →
       </button>
-
-      {/* Resume PDF Modal */}
-      {showResume && <ResumeModal onClose={() => setShowResume(false)} />}
     </div>
   );
 }

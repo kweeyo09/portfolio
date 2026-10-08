@@ -3,7 +3,6 @@ import { Bodies, Body, Composite, Constraint, Engine } from 'matter-js';
 
 /**
  * Letters that jiggle on hover and ease back into place when `reset()` is called.
- * Mirrors the intro page's text interaction.
  */
 export function useLetterPhysics(text: string) {
   const lettersRef = useRef<(HTMLSpanElement | null)[]>([]);
