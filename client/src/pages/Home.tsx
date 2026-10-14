@@ -25,7 +25,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 const FLOWER_URLS = [
   '/assets/flower-lily_dbe070b1.bin',
   '/assets/flower-lotus_439ad204.bin',
-  '/assets/flower-anthurium_2a83d923.bin',
+  '/assets/flower-anthurium_1c7fe559.bin',
 ];
 // Must match POS_SCALE in scripts/bake-flowers.py
 const POS_SCALE = 1 / 8192;

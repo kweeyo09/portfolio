@@ -37,7 +37,7 @@ N_PARTICLES = 60_000
 # Every flower is scaled to fit inside this box (world units), measured as the
 # full width swept while spinning around Y, and the height.
 BOX_WIDTH = 2.7
-BOX_HEIGHT = 1.45
+BOX_HEIGHT = 1.8
 POS_SCALE = 1 / 8192  # int16 range covers +-4 world units
 
 COMPONENTS = {5120: np.int8, 5121: np.uint8, 5122: np.int16, 5123: np.uint16, 5125: np.uint32, 5126: np.float32}
