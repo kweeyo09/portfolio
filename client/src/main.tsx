@@ -8,11 +8,11 @@ import App from "./App";
 import { LOGIN_PATH } from "./const";
 import "./index.css";
 
-// Discourage saving portfolio images: no right-click "Save image" or drag-out
-// (iOS long-press is handled in index.css). Screenshots still work; the
-// watermark covers those.
+// Discourage saving portfolio images and videos: no right-click "Save as…" or
+// drag-out (iOS long-press is handled in index.css, video download buttons via
+// controlsList). Screenshots still work; the image watermark covers those.
 document.addEventListener("contextmenu", e => {
-  if (e.target instanceof HTMLImageElement) e.preventDefault();
+  if (e.target instanceof HTMLImageElement || e.target instanceof HTMLVideoElement) e.preventDefault();
 });
 document.addEventListener("dragstart", e => {
   if (e.target instanceof HTMLImageElement) e.preventDefault();

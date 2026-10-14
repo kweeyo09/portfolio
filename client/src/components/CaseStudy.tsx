@@ -191,6 +191,8 @@ export default function CaseStudy({
               loop
               playsInline
               controls
+              controlsList="nodownload"
+              disablePictureInPicture
               style={{
                 maxWidth: '100%',
                 maxHeight: '88vh',

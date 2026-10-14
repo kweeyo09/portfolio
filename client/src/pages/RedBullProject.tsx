@@ -93,6 +93,8 @@ export default function RedBullProject() {
           loop
           playsInline
           controls
+          controlsList="nodownload"
+          disablePictureInPicture
           style={{
             width: '100%',
             display: 'block',

@@ -94,6 +94,8 @@ export default function KeyboardProject() {
           loop
           playsInline
           controls
+          controlsList="nodownload"
+          disablePictureInPicture
           style={{
             width: '100%',
             display: 'block',

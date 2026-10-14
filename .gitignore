@@ -14,8 +14,9 @@ client/public/assets/0064_b9b87608.png
 client/public/assets/0072_df56ea18.png
 client/public/assets/0119_ea94796b.png
 client/public/assets/jellyflower_bf91d6d2.mp4.png
+client/public/assets/jellyflower_bf91d6d2.webp
 # Original high-bitrate videos; re-encoded copies (faststart) are deployed
-client/public/assets/jellyflower-v2_03e237d7.mp4
+# (Jelly Flower ships its original: re-encoding it visibly lost detail)
 client/public/assets/productanimation_bd4c3604.mp4
 client/public/assets/redbull-v2_340151ae.mp4
 
