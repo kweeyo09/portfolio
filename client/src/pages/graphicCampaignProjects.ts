@@ -28,13 +28,13 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
     note: 'Created during my social media marketing internship at Hasbro. Published on Play-Doh EMEA social channels.',
     layout: 'grid',
     media: [
-      { src: '/assets/playdoh-01_5fcc00af.webp', alt: 'Play-Doh Twirly Tangly Tagliatelle — yellow dough grated into a bowl' },
-      { src: '/assets/playdoh-02_ce7e908f.webp', alt: 'Play-Doh Smishy Smashy Burger Bash — stacked burger layers on red' },
-      { src: '/assets/playdoh-03_895cfb82.webp', alt: "Play-Doh Crunchy Munchy Fish 'n Chips on a wooden table" },
-      { src: '/assets/playdoh-04_c327ee73.webp', alt: 'Play-Doh Doughy Loopy Pretzel — three salted pretzels on concrete' },
-      { src: '/assets/playdoh-05_8f6343b4.webp', alt: 'Play-Doh Swirly Twirly Ice Cream — green scoop in a metal scoop' },
-      { src: '/assets/playdoh-06_126ff0af.webp', alt: 'Play-Doh Bendy Bready Baguette — three yellow baguettes on a board' },
-      { src: '/assets/playdoh-07_f495bfa1.webp', alt: 'Play-Doh recipe card — Super Slice Cake Playset with a slice of cake' },
+      { src: '/assets/playdoh-01_579486b8.webp', alt: 'Play-Doh Twirly Tangly Tagliatelle — yellow dough grated into a bowl' },
+      { src: '/assets/playdoh-02_41f70838.webp', alt: 'Play-Doh Smishy Smashy Burger Bash — stacked burger layers on red' },
+      { src: '/assets/playdoh-03_ef7a1601.webp', alt: "Play-Doh Crunchy Munchy Fish 'n Chips on a wooden table" },
+      { src: '/assets/playdoh-04_ff2a0f16.webp', alt: 'Play-Doh Doughy Loopy Pretzel — three salted pretzels on concrete' },
+      { src: '/assets/playdoh-05_6dfe9e49.webp', alt: 'Play-Doh Swirly Twirly Ice Cream — green scoop in a metal scoop' },
+      { src: '/assets/playdoh-06_f1ceef00.webp', alt: 'Play-Doh Bendy Bready Baguette — three yellow baguettes on a board' },
+      { src: '/assets/playdoh-07_921dd68b.webp', alt: 'Play-Doh recipe card — Super Slice Cake Playset with a slice of cake' },
     ],
   },
   {
@@ -46,8 +46,8 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
     note: 'Created during my social media marketing internship at Hasbro. Published on My Little Pony EMEA social channels.',
     layout: 'grid',
     media: [
-      { src: '/assets/mlp-01_968c2ca6.webp', alt: 'Rainbow Dash flying over Ponyville with a rainbow trail' },
-      { src: '/assets/mlp-02_b97c7f67.webp', alt: 'Rarity walking a red carpet in the castle hall with a purple trail' },
+      { src: '/assets/mlp-01_dd0ded8f.webp', alt: 'Rainbow Dash flying over Ponyville with a rainbow trail' },
+      { src: '/assets/mlp-02_f39c7736.webp', alt: 'Rarity walking a red carpet in the castle hall with a purple trail' },
     ],
   },
   {
@@ -59,9 +59,9 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
     note: 'Live brief from IRIS Worldwide — our team won 1st place. Not commissioned by or affiliated with Brita or AllTrails.',
     layout: 'grid',
     media: [
-      { src: '/assets/brita-01_3e607192.webp', alt: 'Brita × AllTrails co-branded mark with a mountain illustration' },
-      { src: '/assets/brita-02_668383fe.webp', alt: 'Brita in Nature — month-long content calendar over a mountain valley' },
-      { src: '/assets/brita-03_823c69de.webp', alt: 'Brita on the go — filter bottle breaking out of an Instagram post frame' },
+      { src: '/assets/brita-01_9eb79522.webp', alt: 'Brita × AllTrails co-branded mark with a mountain illustration' },
+      { src: '/assets/brita-02_88705700.webp', alt: 'Brita in Nature — month-long content calendar over a mountain valley' },
+      { src: '/assets/brita-03_6f2b565c.webp', alt: 'Brita on the go — filter bottle breaking out of an Instagram post frame' },
     ],
   },
   {
@@ -72,12 +72,12 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
       'A series of two-ink, riso-style posters about walking Hong Kong — a street almanac for Causeway Bay, the tram down to the sea, and a red cab caught in the yellow box — plus a zine, a field note and a postcard. Halftone photography, heavy condensed type and small handwritten notes.',
     layout: 'grid',
     media: [
-      { src: '/assets/hk-zine-01_b1408c56.webp', alt: 'A Street Almanac — Causeway Bay, green and red two-ink poster' },
-      { src: '/assets/hk-zine-02_c45e86f1.webp', alt: 'Down to Sea — cyan and brick red halftone poster of a Hong Kong tram' },
-      { src: '/assets/hk-zine-03_a3864d36.webp', alt: 'Red Cab, Yellow Box — halftone street poster with a red taxi' },
-      { src: '/assets/hk-zine-04_c5bbed9a.webp', alt: 'Zine no. 01 — "slow / stop" road markings in safety orange over an ultramarine halftone street' },
-      { src: '/assets/hk-zine-05_53ce1ce1.webp', alt: 'Field Note 07 — green halftone of tree branches forking against the sky' },
-      { src: '/assets/hk-zine-06_dd59e151.webp', alt: 'Hong Kong postcard, Causeway Bay — cobalt halftone street with a terracotta handwritten note' },
+      { src: '/assets/hk-zine-01_16d29409.webp', alt: 'A Street Almanac — Causeway Bay, green and red two-ink poster' },
+      { src: '/assets/hk-zine-02_cf0c88eb.webp', alt: 'Down to Sea — cyan and brick red halftone poster of a Hong Kong tram' },
+      { src: '/assets/hk-zine-03_0c450e3d.webp', alt: 'Red Cab, Yellow Box — halftone street poster with a red taxi' },
+      { src: '/assets/hk-zine-04_a8f0add5.webp', alt: 'Zine no. 01 — "slow / stop" road markings in safety orange over an ultramarine halftone street' },
+      { src: '/assets/hk-zine-05_34ed38e4.webp', alt: 'Field Note 07 — green halftone of tree branches forking against the sky' },
+      { src: '/assets/hk-zine-06_a04ae5d6.webp', alt: 'Hong Kong postcard, Causeway Bay — cobalt halftone street with a terracotta handwritten note' },
     ],
   },
   {
@@ -88,7 +88,7 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
       'A reworking of a traditional Chinese flower-and-bird painting — peach blossom, brushwork calligraphy and seal stamps pushed into hot pink and acid green.',
     layout: 'stack',
     media: [
-      { src: '/assets/flowerbird_4eee1c54.webp', alt: 'Peach blossom painting with calligraphy in pink and green' },
+      { src: '/assets/flowerbird_c6c020a4.webp', alt: 'Peach blossom painting with calligraphy in pink and green' },
     ],
   },
 ];

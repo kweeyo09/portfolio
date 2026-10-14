@@ -4,6 +4,7 @@
  */
 
 import { useLocation } from 'wouter';
+import CopyrightNotice from '../components/CopyrightNotice';
 
 const JELLYFLOWER_VIDEO = '/assets/jellyflower-v3_f009cb38.mp4';
 
@@ -156,6 +157,7 @@ export default function JellyFlowerProject() {
           and fluid petal movement.
         </p>
       </div>
+      <CopyrightNotice />
     </div>
   );
 }

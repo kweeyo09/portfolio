@@ -4,11 +4,12 @@
  */
 
 import { useLocation } from 'wouter';
+import CopyrightNotice from '../components/CopyrightNotice';
 
 const KEYBOARD_VIDEO = '/assets/productanimation-v2_5ecac766.mp4';
-const KEYBOARD_IMG_1 = '/assets/0064_b9b87608.webp'; // exploded view
-const KEYBOARD_IMG_2 = '/assets/0001_0dc6c9dd.webp'; // floating keyboards
-const KEYBOARD_IMG_3 = '/assets/0119_ea94796b.webp'; // top-down single keyboard
+const KEYBOARD_IMG_1 = '/assets/0064_8fd5f04f.webp'; // exploded view
+const KEYBOARD_IMG_2 = '/assets/0001_655eb5c3.webp'; // floating keyboards
+const KEYBOARD_IMG_3 = '/assets/0119_06bcfebd.webp'; // top-down single keyboard
 
 export default function KeyboardProject() {
   const [, setLocation] = useLocation();
@@ -193,6 +194,7 @@ export default function KeyboardProject() {
           </div>
         ))}
       </div>
+      <CopyrightNotice />
     </div>
   );
 }

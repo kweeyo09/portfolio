@@ -4,10 +4,11 @@
  */
 
 import { useLocation } from 'wouter';
+import CopyrightNotice from '../components/CopyrightNotice';
 
 const REDBULL_VIDEO = '/assets/redbull-v3_a07ce9c0.mp4';
-const REDBULL_IMG_1 = '/assets/0072_df56ea18.webp'; // three cans studio shot
-const REDBULL_IMG_2 = '/assets/0052_400eda6f.webp'; // ice splash close-up
+const REDBULL_IMG_1 = '/assets/0072_a1b84a09.webp'; // three cans studio shot
+const REDBULL_IMG_2 = '/assets/0052_bd072678.webp'; // ice splash close-up
 
 export default function RedBullProject() {
   const [, setLocation] = useLocation();
@@ -211,6 +212,7 @@ export default function RedBullProject() {
           />
         </div>
       </div>
+      <CopyrightNotice />
     </div>
   );
 }

@@ -6,6 +6,7 @@
  */
 
 import { useLocation } from 'wouter';
+import CopyrightNotice from './CopyrightNotice';
 
 export interface CaseStudyMedia {
   src: string;
@@ -216,6 +217,7 @@ export default function CaseStudy({
           ),
         )}
       </div>
+      <CopyrightNotice />
     </div>
   );
 }

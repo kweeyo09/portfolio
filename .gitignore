@@ -123,3 +123,6 @@ temp/
 
 # Vercel
 .vercel/
+
+# Clean, unwatermarked image sources for scripts/watermark-images.py (never deployed)
+originals/

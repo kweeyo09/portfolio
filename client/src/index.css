@@ -134,6 +134,12 @@
   input[type="radio"]:not(:disabled) {
     cursor: pointer;
   }
+  /* Discourage saving images: no drag-out, no iOS long-press "Save to Photos" */
+  img {
+    -webkit-user-drag: none;
+    -webkit-touch-callout: none;
+    user-select: none;
+  }
 }
 
 @layer components {

@@ -8,6 +8,16 @@ import App from "./App";
 import { LOGIN_PATH } from "./const";
 import "./index.css";
 
+// Discourage saving portfolio images: no right-click "Save image" or drag-out
+// (iOS long-press is handled in index.css). Screenshots still work; the
+// watermark covers those.
+document.addEventListener("contextmenu", e => {
+  if (e.target instanceof HTMLImageElement) e.preventDefault();
+});
+document.addEventListener("dragstart", e => {
+  if (e.target instanceof HTMLImageElement) e.preventDefault();
+});
+
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
