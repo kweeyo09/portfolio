@@ -69,12 +69,15 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
     title: 'Hong Kong Street Notes',
     eyebrow: 'Personal Project · Print',
     description:
-      'A series of two-ink, riso-style posters about walking Hong Kong — a street almanac for Causeway Bay, the tram down to the sea, and a red cab caught in the yellow box. Halftone photography, heavy condensed type and small handwritten notes.',
+      'A series of two-ink, riso-style posters about walking Hong Kong — a street almanac for Causeway Bay, the tram down to the sea, and a red cab caught in the yellow box — plus a zine, a field note and a postcard. Halftone photography, heavy condensed type and small handwritten notes.',
     layout: 'grid',
     media: [
       { src: '/assets/hk-zine-01_b1408c56.webp', alt: 'A Street Almanac — Causeway Bay, green and red two-ink poster' },
       { src: '/assets/hk-zine-02_c45e86f1.webp', alt: 'Down to Sea — cyan and brick red halftone poster of a Hong Kong tram' },
       { src: '/assets/hk-zine-03_a3864d36.webp', alt: 'Red Cab, Yellow Box — halftone street poster with a red taxi' },
+      { src: '/assets/hk-zine-04_c5bbed9a.webp', alt: 'Zine no. 01 — "slow / stop" road markings in safety orange over an ultramarine halftone street' },
+      { src: '/assets/hk-zine-05_53ce1ce1.webp', alt: 'Field Note 07 — green halftone of tree branches forking against the sky' },
+      { src: '/assets/hk-zine-06_dd59e151.webp', alt: 'Hong Kong postcard, Causeway Bay — cobalt halftone street with a terracotta handwritten note' },
     ],
   },
   {
