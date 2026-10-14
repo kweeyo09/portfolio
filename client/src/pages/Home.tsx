@@ -1,61 +1,74 @@
 /**
  * 瑶草琪花 · KIXIZ STUDIO
- * Five-flower Particle Bloom
+ * Three-flower Particle Bloom
  *
  * Flowers (left → right):
- *   0 百合   (Lily)        baihe.glb
- *   1 花烛   (Anthurium)   anthurium.glb
- *   2 莲花   (Lotus)       lotus.glb
- *   3 石榴花 (Pomegranate) pomegranate.glb
- *   4 虞美人 (Poppy)       poppy.glb
+ *   0 百合   (Lily)        → UI/UX design
+ *   1 莲花   (Lotus)       → Graphic & Campaign
+ *   2 花烛   (Anthurium)   → 3D & Motion
  *
  * Keyboard fallback:
  *   Space bar / ← →   → scatter / cycle
  *
- * Particle colour: centroid UV sampling from each triangle's texture atlas
- * (avoids UV island seam bleed that causes wrong colours).
+ * Particles are pre-sampled from the GLB models by scripts/bake-flowers.py
+ * (positions + texture colours, sized to a common box), so the page only
+ * downloads ~0.5 MB per flower instead of the full models.
  */
 
 import { useEffect, useRef } from 'react';
+import { useLocation } from 'wouter';
 import SocialLinks from '../components/SocialLinks';
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 
-/* ── CDN URLS ──────────────────────────────────────────────────── */
+/* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
-  '/assets/baihe_4774bde5.glb',
-  '/assets/lotus_f4ee305b.glb',
-  '/assets/anthurium_f0a39f13.glb',
-  '/assets/pomegranate_59701679.glb',
-  '/assets/poppy_c3f1f0b0.glb',
+  '/assets/flower-lily_dbe070b1.bin',
+  '/assets/flower-lotus_439ad204.bin',
+  '/assets/flower-anthurium_2a83d923.bin',
 ];
+// Must match POS_SCALE in scripts/bake-flowers.py
+const POS_SCALE = 1 / 8192;
 
-// Display only 3 flowers with new names (keep all GLBs for later)
-const FLOWER_NAMES = ['百合', '石榴花', '花烛'];
-const FLOWER_EN    = ['UI/UX design', 'Graphic & Campaign', '3D & Motion'];
+// Started once per session, so returning to the homepage is instant
+let flowerData: Promise<ArrayBuffer>[] | null = null;
+const loadFlowerData = () => {
+  flowerData ??= FLOWER_URLS.map(url =>
+    fetch(url).then(r => {
+      if (!r.ok) throw new Error(`${r.status} ${url}`);
+      return r.arrayBuffer();
+    }),
+  );
+  return flowerData;
+};
 
-// Fallback colours if texture fails
-const FLOWER_FALLBACK: [number,number,number][] = [
-  [0.80, 0.48, 0.58],  // lily: dusty rose
-  [0.85, 0.20, 0.15],  // pomegranate: deep red
-  [0.85, 0.15, 0.20],  // anthurium: red
-];
-
-
+const FLOWER_EN = ['UI/UX design', 'Graphic & Campaign', '3D & Motion'];
+const PORTFOLIO_ROUTES = ['/ui-design', '/graphic-campaign', '/3d-motion'];
+const prefetchRoutes = () => {
+  void import('./UIDesign');
+  void import('./GraphicCampaign');
+  void import('./ThreeDMotion');
+};
 
 /* ── PARTICLE CONFIG ───────────────────────────────────────────── */
 const N_FLOWERS     = 3;
-const N_PARTICLES   = 60_000;
 const PARTICLE_SIZE = 0.038;
 const FLOAT_AMP     = 0.008;
 const FLOAT_SPEED   = 0.55;
 const SCATTER_DIST  = 1.8;
 const GATHER_SPEED  = 3.5;
 const SCATTER_SPEED = 2.0;
-const TARGET_RADIUS = 1.4;
-// Spacing between flowers in world-space X
-const FLOWER_SPACING = 4.5;
+// Spacing between flowers in world-space X (wide enough that neighbours stay off-screen)
+const FLOWER_SPACING = 6;
+// Flowers sit below the vertical centre so they clear the label above
+const FLOWER_Y = -0.25;
+// Narrowest world-space width the camera keeps in view (flowers are 2.7 wide)
+const MIN_VIEW_WIDTH = 3.1;
+const CAMERA_FOV = 50;
+const CAMERA_DIST = 5;
+
+const cameraDistance = (aspect: number) =>
+  Math.max(CAMERA_DIST, MIN_VIEW_WIDTH / (2 * Math.tan(THREE.MathUtils.degToRad(CAMERA_FOV / 2)) * aspect));
 
 /* ── VERTEX SHADER ─────────────────────────────────────────────── */
 const VERT = /* glsl */`
@@ -109,191 +122,25 @@ const FRAG = /* glsl */`
   }
 `;
 
-/* ── TEXTURE SAMPLING ──────────────────────────────────────────── */
-type TexData = { data: Uint8ClampedArray; w: number; h: number };
-
-async function buildTexData(tex: THREE.Texture): Promise<TexData | null> {
-  try {
-    const src = tex.image;
-    let imgBitmap: ImageBitmap;
-    if (src instanceof ImageBitmap) {
-      imgBitmap = src;
-    } else if (src instanceof HTMLImageElement || src instanceof HTMLCanvasElement) {
-      imgBitmap = await createImageBitmap(src);
-    } else {
-      return null;
-    }
-    const w = imgBitmap.width, h = imgBitmap.height;
-    const oc = new OffscreenCanvas(w, h);
-    const ctx = oc.getContext('2d')!;
-    ctx.drawImage(imgBitmap, 0, 0);
-    const id = ctx.getImageData(0, 0, w, h);
-    return { data: id.data, w, h };
-  } catch(e) {
-    console.warn('[TEX] buildTexData failed', e);
-    return null;
-  }
-}
-
-function sampleTex(td: TexData, u: number, v: number): [number,number,number] {
-  const uu = Math.max(0, Math.min(1, u));
-  const vv = Math.max(0, Math.min(1, v));
-  const px = Math.min(Math.floor(uu * td.w), td.w - 1);
-  const py = Math.min(Math.floor(vv * td.h), td.h - 1);
-  const j  = (py * td.w + px) * 4;
-  return [td.data[j]/255, td.data[j+1]/255, td.data[j+2]/255];
-}
-
-/* ── SCRIPT LOADER ──────────────────────────────────────────────── */
-function addScript(src: string): Promise<void> {
-  return new Promise((res, rej) => {
-    if (document.querySelector(`script[src="${src}"]`)) { res(); return; }
-    const s = document.createElement('script');
-    s.src = src; s.crossOrigin = 'anonymous';
-    s.onload = () => res();
-    s.onerror = () => rej(new Error(`Script load failed: ${src}`));
-    document.head.appendChild(s);
-  });
-}
-
 /* ── PARTICLE BUILDER ───────────────────────────────────────────── */
-type Tri = {
-  ax:number; ay:number; az:number;
-  bx:number; by:number; bz:number;
-  cx:number; cy:number; cz:number;
-  car:number; cag:number; cab:number;
-  cbr:number; cbg:number; cbb:number;
-  ccr:number; ccg:number; ccb:number;
-  hasVC: boolean;
-  au:number; av:number;
-  bu:number; bv:number;
-  cu:number; cv:number;
-  centU: number; centV: number;
-  area: number;
-  tex: TexData | null;
-};
+function buildParticles(buf: ArrayBuffer): THREE.BufferGeometry {
+  const N = new DataView(buf).getUint32(0, true);
+  const packed = new Int16Array(buf, 4, N * 3);
+  const colours = new Uint8Array(buf, 4 + N * 6, N * 3);
 
-async function buildParticles(
-  gltf: { scene: THREE.Group },
-  fallbackColor: [number,number,number]
-): Promise<{ geo: THREE.BufferGeometry }> {
-  const meshes: THREE.Mesh[] = [];
-  gltf.scene.traverse(o => {
-    if ((o as THREE.Mesh).isMesh) meshes.push(o as THREE.Mesh);
-  });
-
-  const tris: Tri[] = [];
-  let totalArea = 0;
-
-  for (const mesh of meshes) {
-    const geo = mesh.geometry as THREE.BufferGeometry;
-    const pos = geo.attributes.position as THREE.BufferAttribute;
-    const uv  = geo.attributes.uv as THREE.BufferAttribute | undefined;
-    const vc  = geo.attributes.color as THREE.BufferAttribute | undefined;
-    const idx = geo.index;
-
-    const mat = Array.isArray(mesh.material) ? mesh.material[0] : mesh.material;
-    const hasVertexColor = !!vc;
-    let texData: TexData | null = null;
-
-    if (!hasVertexColor && mat && (mat as THREE.MeshStandardMaterial).map) {
-      texData = await buildTexData((mat as THREE.MeshStandardMaterial).map!);
-    }
-
-    const faceCount = idx ? idx.count / 3 : pos.count / 3;
-    for (let f = 0; f < faceCount; f++) {
-      const ia = idx ? idx.getX(f*3)   : f*3;
-      const ib = idx ? idx.getX(f*3+1) : f*3+1;
-      const ic = idx ? idx.getX(f*3+2) : f*3+2;
-
-      const va  = new THREE.Vector3(pos.getX(ia), pos.getY(ia), pos.getZ(ia));
-      const vb  = new THREE.Vector3(pos.getX(ib), pos.getY(ib), pos.getZ(ib));
-      const vc2 = new THREE.Vector3(pos.getX(ic), pos.getY(ic), pos.getZ(ic));
-
-      const area = va.clone().sub(vb).cross(va.clone().sub(vc2)).length() * 0.5;
-      if (area < 1e-10) continue;
-
-      const au = uv ? uv.getX(ia) : 0, av = uv ? uv.getY(ia) : 0;
-      const bu = uv ? uv.getX(ib) : 0, bv = uv ? uv.getY(ib) : 0;
-      const cu = uv ? uv.getX(ic) : 0, cv = uv ? uv.getY(ic) : 0;
-
-      tris.push({
-        ax:va.x, ay:va.y, az:va.z,
-        bx:vb.x, by:vb.y, bz:vb.z,
-        cx:vc2.x, cy:vc2.y, cz:vc2.z,
-        car: vc ? vc.getX(ia) : 0, cag: vc ? vc.getY(ia) : 0, cab: vc ? vc.getZ(ia) : 0,
-        cbr: vc ? vc.getX(ib) : 0, cbg: vc ? vc.getY(ib) : 0, cbb: vc ? vc.getZ(ib) : 0,
-        ccr: vc ? vc.getX(ic) : 0, ccg: vc ? vc.getY(ic) : 0, ccb: vc ? vc.getZ(ic) : 0,
-        hasVC: hasVertexColor,
-        au, av, bu, bv, cu, cv,
-        centU: (au+bu+cu)/3,
-        centV: (av+bv+cv)/3,
-        area, tex: texData
-      });
-      totalArea += area;
-    }
-  }
-
-  // Auto-normalise to TARGET_RADIUS
-  let cx = 0, cy = 0, cz = 0;
-  for (const t of tris) { cx += (t.ax+t.bx+t.cx)/3; cy += (t.ay+t.by+t.cy)/3; cz += (t.az+t.bz+t.cz)/3; }
-  cx /= tris.length; cy /= tris.length; cz /= tris.length;
-  let maxR = 0;
-  for (const t of tris) {
-    for (const [x,y,z] of [[t.ax,t.ay,t.az],[t.bx,t.by,t.bz],[t.cx,t.cy,t.cz]] as [number,number,number][]) {
-      const d = Math.sqrt((x-cx)**2+(y-cy)**2+(z-cz)**2);
-      if (d > maxR) maxR = d;
-    }
-  }
-  const normScale = maxR > 0 ? TARGET_RADIUS / maxR : 1;
-  for (const t of tris) {
-    t.ax = (t.ax-cx)*normScale; t.ay = (t.ay-cy)*normScale; t.az = (t.az-cz)*normScale;
-    t.bx = (t.bx-cx)*normScale; t.by = (t.by-cy)*normScale; t.bz = (t.bz-cz)*normScale;
-    t.cx = (t.cx-cx)*normScale; t.cy = (t.cy-cy)*normScale; t.cz = (t.cz-cz)*normScale;
-  }
-
-  // Weighted random triangle selection
-  const cdf = new Float64Array(tris.length);
-  let acc = 0;
-  for (let i = 0; i < tris.length; i++) { acc += tris[i].area; cdf[i] = acc / totalArea; }
-
-  const N = N_PARTICLES;
-  const posArr    = new Float32Array(N * 3);
-  const colArr    = new Float32Array(N * 3);
-  const phaseArr  = new Float32Array(N);
-  const seedArr   = new Float32Array(N);
+  const posArr     = new Float32Array(N * 3);
+  const phaseArr   = new Float32Array(N);
+  const seedArr    = new Float32Array(N);
   const scatterArr = new Float32Array(N * 3);
 
   for (let i = 0; i < N; i++) {
-    const r = Math.random();
-    let lo = 0, hi = tris.length - 1;
-    while (lo < hi) { const mid = (lo+hi)>>1; if (cdf[mid] < r) lo=mid+1; else hi=mid; }
-    const tri = tris[lo];
-
-    let u1 = Math.random(), u2 = Math.random();
-    if (u1 + u2 > 1) { u1 = 1-u1; u2 = 1-u2; }
-    const u3 = 1 - u1 - u2;
-
-    posArr[i*3]   = u1*tri.ax + u2*tri.bx + u3*tri.cx;
-    posArr[i*3+1] = u1*tri.ay + u2*tri.by + u3*tri.cy;
-    posArr[i*3+2] = u1*tri.az + u2*tri.bz + u3*tri.cz;
-
-    // Centroid UV sampling — avoids UV island seam bleed
-    if (tri.hasVC) {
-      colArr[i*3]   = u1*tri.car + u2*tri.cbr + u3*tri.ccr;
-      colArr[i*3+1] = u1*tri.cag + u2*tri.cbg + u3*tri.ccg;
-      colArr[i*3+2] = u1*tri.cab + u2*tri.cbb + u3*tri.ccb;
-    } else if (tri.tex) {
-      const [cr,cg,cb] = sampleTex(tri.tex, tri.centU, tri.centV);
-      colArr[i*3]=cr; colArr[i*3+1]=cg; colArr[i*3+2]=cb;
-    } else {
-      colArr[i*3]=fallbackColor[0]; colArr[i*3+1]=fallbackColor[1]; colArr[i*3+2]=fallbackColor[2];
-    }
+    const ox = posArr[i*3]   = packed[i*3]   * POS_SCALE;
+    const oy = posArr[i*3+1] = packed[i*3+1] * POS_SCALE;
+    const oz = posArr[i*3+2] = packed[i*3+2] * POS_SCALE;
 
     phaseArr[i] = Math.random() * Math.PI * 2;
     seedArr[i]  = Math.random();
 
-    const ox = posArr[i*3], oy = posArr[i*3+1], oz = posArr[i*3+2];
     const len = Math.sqrt(ox*ox + oy*oy + oz*oz) || 1;
     const spread = SCATTER_DIST * (0.6 + Math.random() * 0.8);
     scatterArr[i*3]   = ox + (ox/len)*spread + (Math.random()-0.5)*0.5;
@@ -301,23 +148,24 @@ async function buildParticles(
     scatterArr[i*3+2] = oz + (oz/len)*spread + (Math.random()-0.5)*0.5;
   }
 
+  const origin = new THREE.BufferAttribute(posArr, 3);
   const geo = new THREE.BufferGeometry();
-  geo.setAttribute('position',  new THREE.BufferAttribute(posArr,   3));
-  geo.setAttribute('aColor',    new THREE.BufferAttribute(colArr,   3));
-  geo.setAttribute('aOrigin',   new THREE.BufferAttribute(posArr.slice(), 3));
+  geo.setAttribute('position',  origin);
+  geo.setAttribute('aOrigin',   origin);
+  geo.setAttribute('aColor',    new THREE.BufferAttribute(colours, 3, true));
   geo.setAttribute('aScatter',  new THREE.BufferAttribute(scatterArr, 3));
   geo.setAttribute('aPhase',    new THREE.BufferAttribute(phaseArr,  1));
   geo.setAttribute('aSeed',     new THREE.BufferAttribute(seedArr,   1));
-  geo.computeBoundingBox();
-  geo.computeBoundingSphere();
-
-  return { geo };
+  return geo;
 }
 
 /* ── MAIN COMPONENT ─────────────────────────────────────────────── */
 export default function Home() {
   const mountRef      = useRef<HTMLDivElement>(null);
   const labelRef      = useRef<HTMLDivElement>(null);
+  const [, navigate]  = useLocation();
+  const navigateRef   = useRef(navigate);
+  navigateRef.current = navigate;
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -330,9 +178,7 @@ export default function Home() {
     mountRef.current.appendChild(renderer.domElement);
 
     const scene  = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.01, 200);
-    camera.position.set(0, 0, 5);
-    camera.lookAt(0, 0, 0);
+    const camera = new THREE.PerspectiveCamera(CAMERA_FOV, window.innerWidth / window.innerHeight, 0.01, 200);
 
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.enableDamping = true;
@@ -364,54 +210,50 @@ export default function Home() {
     // Camera pan
     let camTargetX  = FLOWER_X[0];
     let camCurrentX = FLOWER_X[0];
-    camera.position.set(FLOWER_X[0], 0, 5);
+    camera.position.set(FLOWER_X[0], 0, cameraDistance(camera.aspect));
     controls.target.set(FLOWER_X[0], 0, 0);
 
     const clock = new THREE.Clock();
 
     /* ── LOAD ALL FLOWERS ── */
-    const loader = new GLTFLoader();
-    const loadFlower = (url: string, idx: number, fallback: [number,number,number]) => {
-      loader.load(url, async (gltf) => {
-        try {
-          const { geo } = await buildParticles(gltf, fallback);
+    let disposed = false;
+    loadFlowerData().forEach((data, idx) => {
+      data.then(buf => {
+        if (disposed) return;
+        const geo = buildParticles(buf);
 
-          const mat = new THREE.ShaderMaterial({
-            vertexShader: VERT,
-            fragmentShader: FRAG,
-            uniforms: {
-              uProgress: { value: 0 },
-              uTime:     { value: 0 },
-              uSize:     { value: PARTICLE_SIZE },
-            },
-            vertexColors: false,
-            transparent: true,
-            depthWrite: false,
-            blending: THREE.NormalBlending,
-          });
+        const mat = new THREE.ShaderMaterial({
+          vertexShader: VERT,
+          fragmentShader: FRAG,
+          uniforms: {
+            uProgress: { value: 0 },
+            uTime:     { value: 0 },
+            uSize:     { value: PARTICLE_SIZE },
+          },
+          vertexColors: false,
+          transparent: true,
+          depthWrite: false,
+          blending: THREE.NormalBlending,
+        });
 
-          const points = new THREE.Points(geo, mat);
-          points.frustumCulled = false;
-          points.visible = true;
-          points.position.x = FLOWER_X[idx];
+        const points = new THREE.Points(geo, mat);
+        points.frustumCulled = false;
+        points.visible = true;
+        points.position.set(FLOWER_X[idx], FLOWER_Y, 0);
 
-          scene.add(points);
-          flowers[idx].points = points;
-          flowers[idx].mat    = mat;
-          flowers[idx].loaded = true;
+        scene.add(points);
+        flowers[idx].points = points;
+        flowers[idx].mat    = mat;
+        flowers[idx].loaded = true;
 
-          updateLabel();
-        } catch (err) {
-          console.error(`[LOAD] Failed: ${FLOWER_NAMES[idx]}`, err);
-        }
-      }, undefined, (err) => {
-        console.error(`[LOAD] Failed: ${FLOWER_NAMES[idx]}`, err);
+        updateLabel();
+      }).catch(err => {
+        console.error(`[LOAD] Failed: ${FLOWER_EN[idx]}`, err);
       });
-    };
+    });
 
-    for (let i = 0; i < N_FLOWERS; i++) {
-      loadFlower(FLOWER_URLS[i], i, FLOWER_FALLBACK[i]);
-    }
+    // Fetch the category pages' code while the visitor is looking at the flowers
+    const prefetchTimer = window.setTimeout(prefetchRoutes, 1500);
 
     /* ── LABEL UPDATE ── */
     const updateLabel = () => {
@@ -419,8 +261,8 @@ export default function Home() {
       const prevIdx = (activeIdx - 1 + N_FLOWERS) % N_FLOWERS;
       const nextIdx = (activeIdx + 1) % N_FLOWERS;
       labelRef.current.innerHTML =
-        `<span style="font-size:2.2rem;letter-spacing:0.08em;font-weight:normal;color:#fff;font-family:'Instrument Serif',serif;font-style:italic">${FLOWER_EN[activeIdx]}</span>` +
-        `<span style="display:block;font-size:0.9rem;letter-spacing:0.15em;opacity:0.4;margin-top:14px;font-family:'Barlow',sans-serif;font-weight:300">← ${FLOWER_EN[prevIdx]} · ${FLOWER_EN[nextIdx]} →</span>`;
+        `<span style="font-size:clamp(1.7rem,7vw,2.2rem);letter-spacing:0.08em;font-weight:normal;color:#fff;font-family:'Instrument Serif',serif;font-style:italic">${FLOWER_EN[activeIdx]}</span>` +
+        `<span style="display:block;font-size:clamp(0.72rem,3.2vw,0.9rem);letter-spacing:0.15em;opacity:0.4;margin-top:14px;font-family:'Barlow',sans-serif;font-weight:300">← ${FLOWER_EN[prevIdx]} · ${FLOWER_EN[nextIdx]} →</span>`;
     };
     updateLabel();
 
@@ -500,27 +342,39 @@ export default function Home() {
     renderer.domElement.addEventListener('touchend', onTouchEnd, { passive: true });
 
     /* ── CANVAS CLICK / TAP: scatter particles ── */
-    const portfolioRoutes = ['/ui-design', '/graphic-campaign', '/3d-motion'];
-    const onCanvasClick = () => {
+    // Taps also fire click, so touchend isn't needed; a drag to orbit shouldn't count
+    let pointerDownX = 0;
+    let pointerDownY = 0;
+    let leaving = false;
+    const onPointerDown = (e: PointerEvent) => {
+      pointerDownX = e.clientX;
+      pointerDownY = e.clientY;
+    };
+    const onCanvasClick = (e: MouseEvent) => {
+      if (leaving || Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY) > 8) return;
       const f = flowers[activeIdx];
       if (f.targetProgress > 0.5) {
         f.targetProgress = 0;
       } else {
         f.targetProgress = 1;
-        // Smooth fade transition
+        leaving = true;
+        // Fade to black, switch page in-app, then fade the new page in
         const overlay = document.createElement('div');
-        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0);z-index:9999;pointer-events:none;transition:background 0.6s ease-in-out';
+        overlay.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0);z-index:9999;pointer-events:none;transition:background 0.45s ease-in-out';
         document.body.appendChild(overlay);
+        const route = PORTFOLIO_ROUTES[activeIdx];
         requestAnimationFrame(() => {
           overlay.style.background = 'rgba(0,0,0,1)';
           setTimeout(() => {
-            window.location.href = portfolioRoutes[activeIdx];
-          }, 300);
+            navigateRef.current(route);
+            overlay.style.background = 'rgba(0,0,0,0)';
+            setTimeout(() => overlay.remove(), 500);
+          }, 450);
         });
       }
     };
+    renderer.domElement.addEventListener('pointerdown', onPointerDown);
     renderer.domElement.addEventListener('click', onCanvasClick);
-    renderer.domElement.addEventListener('touchend', onCanvasClick, { passive: true });
 
     /* ── ANIMATION LOOP ── */
     let raf = 0;
@@ -554,16 +408,22 @@ export default function Home() {
     const onResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
+      // Pull back on narrow screens so the whole flower stays in frame
+      const offset = camera.position.clone().sub(controls.target);
+      camera.position.copy(controls.target).add(offset.setLength(cameraDistance(camera.aspect)));
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', onResize);
 
     /* ── CLEANUP ── */
     return () => {
+      disposed = true;
       cancelAnimationFrame(raf);
+      window.clearTimeout(prefetchTimer);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
       renderer.domElement.removeEventListener('wheel', onWheel);
+      renderer.domElement.removeEventListener('pointerdown', onPointerDown);
       renderer.domElement.removeEventListener('click', onCanvasClick);
       renderer.domElement.removeEventListener('touchstart', onTouchStart);
       renderer.domElement.removeEventListener('touchend', onTouchEnd);
@@ -587,8 +447,9 @@ export default function Home() {
 
       {/* Flower label */}
       <div ref={labelRef} style={{
-        position: 'absolute', top: '50%', left: '50%',
-        transform: 'translate(-50%, -50%) translateY(-220px)',
+        // Sits in the top band; the flowers are drawn below it (FLOWER_Y)
+        position: 'absolute', top: 'clamp(84px, 15vh, 160px)', left: '50%',
+        transform: 'translateX(-50%)', whiteSpace: 'nowrap',
         color: '#fff', fontFamily: "'Instrument Serif', serif", fontStyle: 'italic',
         textAlign: 'center', pointerEvents: 'none', userSelect: 'none',
         transition: 'opacity 0.3s',
