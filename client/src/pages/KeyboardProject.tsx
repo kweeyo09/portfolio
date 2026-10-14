@@ -1,5 +1,5 @@
 /**
- * Keyboard Commercial — 3D & Motion Case Study
+ * Keyboard Commercial — Motion Graphics Case Study
  * Layout: full-bleed video hero → three render stills below
  */
 
@@ -73,7 +73,7 @@ export default function KeyboardProject() {
             fontWeight: '300',
           }}
         >
-          3D & MOTION · CASE STUDY
+          MOTION GRAPHICS · CASE STUDY
         </span>
       </div>
 

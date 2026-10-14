@@ -5,7 +5,7 @@
  * Flowers (left → right):
  *   0 百合   (Lily)        → UI/UX design
  *   1 莲花   (Lotus)       → Graphic & Campaign
- *   2 花烛   (Anthurium)   → 3D & Motion
+ *   2 花烛   (Anthurium)   → Motion Graphics
  *
  * Keyboard fallback:
  *   Space bar / ← →   → scatter / cycle
@@ -42,7 +42,7 @@ const loadFlowerData = () => {
   return flowerData;
 };
 
-const FLOWER_EN = ['UI/UX design', 'Graphic & Campaign', '3D & Motion'];
+const FLOWER_EN = ['UI/UX design', 'Graphic & Campaign', 'Motion Graphics'];
 const PORTFOLIO_ROUTES = ['/ui-design', '/graphic-campaign', '/3d-motion'];
 const prefetchRoutes = () => {
   void import('./UIDesign');

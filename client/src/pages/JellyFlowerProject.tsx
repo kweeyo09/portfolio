@@ -1,5 +1,5 @@
 /**
- * Jelly Flower — 3D & Motion Case Study
+ * Jelly Flower — Motion Graphics Case Study
  * Layout: full-bleed video hero (no images below, video only)
  */
 
@@ -70,7 +70,7 @@ export default function JellyFlowerProject() {
             fontWeight: '300',
           }}
         >
-          3D & MOTION · CASE STUDY
+          MOTION GRAPHICS · CASE STUDY
         </span>
       </div>
 

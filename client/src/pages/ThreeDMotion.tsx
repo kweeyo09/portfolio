@@ -10,7 +10,7 @@ const projects = [
 export default function ThreeDMotion() {
   return (
     <ProjectIndex
-      heading="3D & Motion"
+      heading="Motion Graphics"
       description="3D product visualisation, animation and motion graphics that bring ideas to life."
       projects={projects}
     />

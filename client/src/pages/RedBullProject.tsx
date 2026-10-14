@@ -1,5 +1,5 @@
 /**
- * Red Bull — 3D & Motion Case Study
+ * Red Bull — Motion Graphics Case Study
  * Layout: full-bleed video hero → two render stills below
  */
 
@@ -73,7 +73,7 @@ export default function RedBullProject() {
             fontWeight: '300',
           }}
         >
-          3D & MOTION · CASE STUDY
+          MOTION GRAPHICS · CASE STUDY
         </span>
       </div>
 

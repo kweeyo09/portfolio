@@ -30,7 +30,7 @@ function Router() {
       <Route path={"/3d-motion"} component={ThreeDMotion} />
       <Route path={"/graphic-campaign"} component={GraphicCampaign} />
       <Route path={"/graphic-campaign/:slug"} component={GraphicCampaignProject} />
-      {/* Product design was merged into 3D & Motion; keep old links working */}
+      {/* Product design was merged into Motion Graphics; keep old links working */}
       <Route path={"/product-design"}><Redirect to="/3d-motion" replace /></Route>
       <Route path={"/budget-app"} component={BudgetApp} />
       <Route path={"/limelight"} component={Limelight} />
