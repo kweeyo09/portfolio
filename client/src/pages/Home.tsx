@@ -26,6 +26,7 @@ const FLOWER_URLS = [
   '/assets/flower-lily_dbe070b1.bin',
   '/assets/flower-lotus_439ad204.bin',
   '/assets/flower-anthurium_1c7fe559.bin',
+  '/assets/flower-experiments-v1.bin',
 ];
 // Must match POS_SCALE in scripts/bake-flowers.py
 const POS_SCALE = 1 / 8192;
@@ -42,16 +43,17 @@ const loadFlowerData = () => {
   return flowerData;
 };
 
-const FLOWER_EN = ['UI/UX design', 'Graphic & Campaign', 'Motion Graphics'];
-const PORTFOLIO_ROUTES = ['/ui-design', '/graphic-campaign', '/3d-motion'];
+const FLOWER_EN = ['UI/UX design', 'Graphic & Campaign', 'Motion Graphics', "Cool things I've been working on"];
+const PORTFOLIO_ROUTES = ['/ui-design', '/graphic-campaign', '/3d-motion', '/cool-things'];
 const prefetchRoutes = () => {
   void import('./UIDesign');
   void import('./GraphicCampaign');
   void import('./ThreeDMotion');
+  void import('./CoolThings');
 };
 
 /* ── PARTICLE CONFIG ───────────────────────────────────────────── */
-const N_FLOWERS     = 3;
+const N_FLOWERS     = FLOWER_URLS.length;
 const PARTICLE_SIZE = 0.038;
 const FLOAT_AMP     = 0.008;
 const FLOAT_SPEED   = 0.55;
@@ -449,7 +451,7 @@ export default function Home() {
       <div ref={labelRef} style={{
         // Sits in the top band; the flowers are drawn below it (FLOWER_Y)
         position: 'absolute', top: 'clamp(84px, 15vh, 160px)', left: '50%',
-        transform: 'translateX(-50%)', whiteSpace: 'nowrap',
+        transform: 'translateX(-50%)', width: 'min(92vw, 760px)', whiteSpace: 'normal',
         color: '#fff', fontFamily: "'Instrument Serif', serif", fontStyle: 'italic',
         textAlign: 'center', pointerEvents: 'none', userSelect: 'none',
         transition: 'opacity 0.3s',

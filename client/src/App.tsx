@@ -7,6 +7,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
 const Home = lazy(() => import("./pages/Home"));
+const CoolThings = lazy(() => import("./pages/CoolThings"));
+const PaperArt = lazy(() => import("./pages/PaperArt"));
 const UIDesign = lazy(() => import("./pages/UIDesign"));
 const ThreeDMotion = lazy(() => import("./pages/ThreeDMotion"));
 const GraphicCampaign = lazy(() => import("./pages/GraphicCampaign"));
@@ -26,6 +28,8 @@ function Router() {
     <Switch>
       <Route path={"/"} component={Home} />
       <Route path={"/flowers"} component={Home} />
+      <Route path={"/cool-things"} component={CoolThings} />
+      <Route path={"/paper-art"} component={PaperArt} />
       <Route path={"/ui-design"} component={UIDesign} />
       <Route path={"/3d-motion"} component={ThreeDMotion} />
       <Route path={"/graphic-campaign"} component={GraphicCampaign} />
