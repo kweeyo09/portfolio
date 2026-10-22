@@ -1,104 +1,80 @@
-import { useEffect, useLayoutEffect, useRef, useState } from 'react';
-import { useLocation } from 'wouter';
+import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { SplitText } from 'gsap/SplitText';
-import { useLetterPhysics } from '../components/useLetterPhysics';
 import './Introduction.css';
 
-gsap.registerPlugin(ScrollTrigger, SplitText);
+const Flowers = lazy(() => import('./Home'));
 const roles = ['a designer', 'a product designer', 'a vibecoder'];
 
-function Role({ text, onNext, reduced }: { text: string; onNext: () => void; reduced: boolean }) {
-  const { letters, hoverHandlers, scatter } = useLetterPhysics(text);
+function HighlightRole({ active, reduced }: { active: boolean; reduced: boolean }) {
+  const [index, setIndex] = useState(0);
+  const [selected, setSelected] = useState(false);
   useEffect(() => {
-    if (reduced) return;
-    let replacement: number;
-    const timer = window.setTimeout(() => {
-      scatter();
-      replacement = window.setTimeout(onNext, 650);
-    }, 3300);
-    return () => { window.clearTimeout(timer); window.clearTimeout(replacement); };
-  }, [onNext, reduced, scatter]);
-  return <span className="intro-role" {...hoverHandlers} aria-label={text}>
-    <span aria-hidden="true">{letters}</span>
-  </span>;
+    if (!active || reduced) return;
+    let timer: number;
+    let stopped = false;
+    const schedule = () => {
+      timer = window.setTimeout(() => {
+        if (stopped || document.hidden) { if (!stopped) schedule(); return; }
+        setSelected(true);
+        timer = window.setTimeout(() => {
+          setIndex(value => (value + 1) % roles.length);
+          timer = window.setTimeout(() => { setSelected(false); schedule(); }, 350);
+        }, 450);
+      }, 3000);
+    };
+    schedule();
+    return () => { stopped = true; window.clearTimeout(timer); setSelected(false); };
+  }, [active, reduced]);
+  return <span className="sky-role-slot"><span className={`sky-role${selected ? ' is-selected' : ''}`}>{roles[index]}</span></span>;
 }
 
 export default function Introduction() {
   const root = useRef<HTMLElement>(null);
-  const first = useRef<HTMLVideoElement>(null);
-  const second = useRef<HTMLVideoElement>(null);
-  const [, navigate] = useLocation();
-  const [phase, setPhase] = useState(0);
-  const [role, setRole] = useState(0);
-  const [paused, setPaused] = useState(false);
+  const about = useRef<HTMLElement>(null);
+  const work = useRef<HTMLElement>(null);
+  const [aboutVisible, setAboutVisible] = useState(false);
+  const [showWork, setShowWork] = useState(false);
   const [reduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
-  const advanceRole = useRef(() => setRole(value => (value + 1) % roles.length)).current;
-
-  useLayoutEffect(() => {
-    window.scrollTo(0, 0);
-    let split: SplitText | undefined;
-    let titleTween: gsap.core.Tween | undefined;
-    let active = true;
-    const context = gsap.context(() => {
-      const timeline = gsap.timeline({scrollTrigger: {
-        trigger: root.current, start: 'top top', end: 'bottom bottom', scrub: reduced ? true : .65,
-        onUpdate: self => setPhase(self.progress < .32 ? 0 : 1),
-        onLeave: () => { if (active) { window.scrollTo(0, 0); navigate('/flowers'); } },
-      }});
-      timeline.to('.intro-first', {opacity: 0, scale: reduced ? 1 : 1.06, duration: .3}, .05)
-        .fromTo('.intro-second', {opacity: 0, yPercent: reduced ? 0 : 9}, {opacity: 1, yPercent: 0, duration: .35}, .2)
-        .to('.intro-second', {opacity: 0, yPercent: reduced ? 0 : -6, duration: .15}, .85);
-      document.fonts.ready.then(() => {
-        if (!active || reduced) return;
-        split = SplitText.create('.intro-hello', {type: 'chars', mask: 'chars'});
-        titleTween = gsap.from(split.chars, {yPercent: 110, rotate: 6, opacity: 0, duration: .85, stagger: .045, ease: 'power3.out',
-          scrollTrigger: {trigger: root.current, start: 'top -55%', toggleActions: 'play none none reverse'}});
-      });
-    }, root);
-    return () => { active = false; titleTween?.scrollTrigger?.kill(); titleTween?.kill(); split?.revert(); context.revert(); };
-  }, [navigate, reduced]);
 
   useEffect(() => {
-    const update = () => {
-      [first.current, second.current].forEach((video, index) => {
-        if (!video) return;
-        if (document.hidden || reduced || paused || phase !== index) video.pause();
-        else void video.play().catch(() => {});
-      });
-    };
-    update();
-    document.addEventListener('visibilitychange', update);
-    return () => document.removeEventListener('visibilitychange', update);
-  }, [phase, reduced, paused]);
+    const observer = new IntersectionObserver(entries => {
+      for (const entry of entries) {
+        if (entry.target === about.current) setAboutVisible(entry.isIntersecting);
+        if (entry.target === work.current && entry.isIntersecting) setShowWork(true);
+      }
+    }, {threshold: .1});
+    if (about.current) observer.observe(about.current);
+    if (work.current) observer.observe(work.current);
+    void import('./Home');
+    return () => observer.disconnect();
+  }, []);
 
-  const next = () => {
-    if (phase === 1) { window.scrollTo(0, 0); navigate('/flowers'); }
-    else window.scrollTo({top: window.innerHeight * 1.05, behavior: reduced ? 'instant' : 'smooth'});
-  };
+  useLayoutEffect(() => {
+    if (reduced) return;
+    const context = gsap.context(() => {
+      gsap.from('.sky-brand-line', {y: 28, duration: 1.15, stagger: .12, ease: 'power3.out'});
+    }, root);
+    return () => context.revert();
+  }, [reduced]);
 
-  return <main className="intro" ref={root}>
-    <div className="intro-stage">
-      <section className="intro-scene intro-first" aria-label="Kixizz Studio, portfolio 2026" aria-hidden={phase !== 0}>
-        <video ref={first} className="intro-film" src="/assets/intro/studio_3aa2d22f.mp4" poster="/assets/intro/studio_0aa08e4b.jpg" muted playsInline loop preload="auto" aria-hidden="true" />
-        <h1 className="sr-only">Kixizz Studio — Portfolio ’26</h1>
+  return <main className="sky-introduction" ref={root}>
+    <div className="sky-story">
+      <div className="sky-backdrop" aria-hidden="true"><img src="/assets/intro/sky_d554efb3.webp" alt="" fetchPriority="high" /></div>
+      <section className="sky-panel sky-welcome" aria-label="Kixizz Studio">
+        <div className="sky-edition"><span>KIXIZZ</span><span>PORTFOLIO ’26</span></div>
+        <h1><span className="sky-brand-line">Kixizz</span><span className="sky-brand-line">Studio.</span></h1>
+        <p className="sky-scroll">Scroll to meet me <span aria-hidden="true">↓</span></p>
       </section>
-      <section className="intro-scene intro-second" aria-label="About Kiki" aria-hidden={phase !== 1}>
-        <video ref={second} className="intro-film" src="/assets/intro/about_6b9a5f64.mp4" poster="/assets/intro/about_bdf6ea31.jpg" muted playsInline loop preload="metadata" aria-hidden="true" />
-        <div className="intro-bio">
-          <h2 className="intro-hello">Hi, I’m Kiki.</h2>
-          <div className="intro-role-space">{phase === 1 && (reduced || paused
-            ? <span className="intro-role">{roles[role]}</span>
-            : <Role key={role} text={roles[role]} onNext={advanceRole} reduced={false} />)}</div>
-          <p>based in London.</p>
+      <section className="sky-panel sky-about" ref={about} aria-label="About Kiki">
+        <div className="sky-bio">
+          <h2>Hi, I’m Kiki.</h2>
+          <p><HighlightRole active={aboutVisible} reduced={reduced} /><span className="sky-location">based in London.</span></p>
         </div>
+        <p className="sky-scroll">Keep scrolling to explore <span aria-hidden="true">↓</span></p>
       </section>
-      <nav className="intro-nav" aria-label="Introduction navigation">
-        {!reduced && <button className="intro-pause" onClick={() => setPaused(value => !value)} aria-pressed={paused}>{paused ? 'Resume motion' : 'Pause motion'}</button>}
-        <a href="/flowers">Skip to work <span aria-hidden="true">↗</span></a>
-        <button onClick={next}>{phase === 0 ? 'Scroll to meet me' : 'Scroll to explore my work'} <span aria-hidden="true">↓</span></button>
-      </nav>
     </div>
+    <section className="sky-work" ref={work} aria-label="Explore my work">
+      {showWork && <Suspense fallback={<span className="sky-loading">Opening the studio…</span>}><Flowers /></Suspense>}
+    </section>
   </main>;
 }

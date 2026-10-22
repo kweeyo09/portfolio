@@ -291,6 +291,7 @@ export default function Home() {
 
     /* ── KEYBOARD FALLBACK ── */
     const onKey = (e: KeyboardEvent) => {
+      if (renderer.domElement.getBoundingClientRect().top > 2) return;
       if (e.code === 'Space') {
         e.preventDefault();
         const f = flowers[activeIdx];
@@ -352,6 +353,7 @@ export default function Home() {
     const onContextMenu = (e: MouseEvent) => e.preventDefault();
     let wheelCooldown = 0;
     const onWheel = (e: WheelEvent) => {
+      if (canvas.getBoundingClientRect().top > 2) return;
       e.preventDefault();
       if (e.ctrlKey) {
         setZoom(zoom * Math.exp(-e.deltaY * 0.01));
@@ -464,7 +466,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ width: '100vw', height: '100vh', background: '#000', overflow: 'hidden', position: 'relative' }}>
+    <div style={{ width: '100%', height: '100vh', background: '#000', overflow: 'hidden', position: 'relative' }}>
       {/* Three.js canvas mount */}
       <div ref={mountRef} style={{ position: 'absolute', inset: 0 }} />
 
@@ -589,7 +591,7 @@ export default function Home() {
           window.dispatchEvent(event);
         }}
         style={{
-          position: 'fixed',
+          position: 'absolute',
           bottom: 'max(32px, env(safe-area-inset-bottom))',
           right: 'max(32px, env(safe-area-inset-right))',
           borderRadius: 8,
