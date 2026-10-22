@@ -31,7 +31,7 @@ FLOWERS = [
     ("baihe_4774bde5.glb", "flower-lily"),
     ("lotus_f4ee305b.glb", "flower-lotus"),
     ("anthurium_f0a39f13.glb", "flower-anthurium"),
-    ("hibiscus.glb", "flower-hibiscus"),
+    ("rose.glb", "flower-rose"),
 ]
 
 N_PARTICLES = 60_000
@@ -126,6 +126,10 @@ def bake(src, dst, rng):
     pts = u1[:, None] * t[:, 0] + u2[:, None] * t[:, 1] + u3[:, None] * t[:, 2]
     rgb = col[pick].astype(np.uint8)
 
+    # The rose scan lies face-up. Stand the bloom upright for the carousel.
+    if dst == "flower-rose":
+        pts = pts[:, [0, 2, 1]] * np.array([1, -1, 1])
+
     # Centre on the bounding box (ignoring a few stray points) and fit the box
     lo, hi = np.percentile(pts, 0.1, axis=0), np.percentile(pts, 99.9, axis=0)
     pts -= (lo + hi) / 2
@@ -147,4 +151,4 @@ def bake(src, dst, rng):
 if __name__ == "__main__":
     rng = np.random.default_rng(7)
     for src, dst in FLOWERS:
-        bake(src, dst, np.random.default_rng(7) if dst == "flower-hibiscus" else rng)
+        bake(src, dst, np.random.default_rng(7) if dst == "flower-rose" else rng)

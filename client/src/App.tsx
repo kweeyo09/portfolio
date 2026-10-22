@@ -33,6 +33,7 @@ function Router() {
       <Route path={"/ui-design"} component={UIDesign} />
       <Route path={"/3d-motion"} component={ThreeDMotion} />
       <Route path={"/graphic-campaign"} component={GraphicCampaign} />
+      <Route path={"/graphic-campaign/armani"} component={ArmaniProject} />
       <Route path={"/graphic-campaign/:slug"} component={GraphicCampaignProject} />
       {/* Product design was merged into Motion Graphics; keep old links working */}
       <Route path={"/product-design"}><Redirect to="/3d-motion" replace /></Route>
@@ -42,7 +43,7 @@ function Router() {
       <Route path={"/ccn-london"} component={CCNLondon} />
       <Route path={"/product-design/redbull"} component={RedBullProject} />
       <Route path={"/product-design/keyboard"} component={KeyboardProject} />
-      <Route path={"/product-design/armani"} component={ArmaniProject} />
+      <Route path={"/product-design/armani"}><Redirect to="/graphic-campaign/armani" replace /></Route>
       <Route path={"/3d-motion/jellyflower"} component={JellyFlowerProject} />
       <Route path={"/3d-motion/people-running"}><Redirect to="/3d-motion" replace /></Route>
       <Route path={"/404"} component={NotFound} />

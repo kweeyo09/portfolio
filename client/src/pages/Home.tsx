@@ -3,7 +3,7 @@
  * Four-flower Particle Bloom
  *
  * Flowers (left → right):
- *   0 Hibiscus → Cool things I have been working on
+ *   0 Rose → Cool things I have been working on
  *   1 Lily → UI/UX design
  *   2 Lotus → Graphic & Campaign
  *   3 Anthurium → Motion Graphics
@@ -24,7 +24,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
-  '/assets/flower-hibiscus_06dd1d06.bin',
+  '/assets/flower-rose_824d2395.bin',
   '/assets/flower-lily_dbe070b1.bin',
   '/assets/flower-lotus_439ad204.bin',
   '/assets/flower-anthurium_1c7fe559.bin',

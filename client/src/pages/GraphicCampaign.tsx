@@ -1,10 +1,10 @@
 import ProjectIndex from '../components/ProjectIndex';
 import { CAMPAIGN_PROJECTS } from './graphicCampaignProjects';
 
-const projects = CAMPAIGN_PROJECTS.map(({ title, slug }) => ({
+const projects = [{ title: 'Armani Perfume Campaign', href: '/graphic-campaign/armani' }, ...CAMPAIGN_PROJECTS.map(({ title, slug }) => ({
   title,
   href: `/graphic-campaign/${slug}`,
-}));
+}))];
 
 export default function GraphicCampaign() {
   return (
