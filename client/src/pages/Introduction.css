@@ -1,0 +1,31 @@
+.intro {height:300svh;background:#000;color:#fbf9e7;}
+.intro-stage {height:100svh;position:sticky;top:0;overflow:hidden;isolation:isolate;}
+.intro-scene {position:absolute;inset:0;display:grid;place-items:center;}
+.intro-first {background:#8298a8;}
+.intro-second {opacity:0;background:#2b2c26;}
+.intro-film {position:absolute;width:100%;height:100%;object-fit:cover;pointer-events:none;}
+.intro-bio {position:relative;z-index:1;width:min(60vw,1000px);text-align:center;margin-left:-7vw;}
+.intro-hello {font:italic 400 clamp(3rem,6vw,7.5rem)/1.12 'Instrument Serif',serif;margin:0 0 .35em;}
+.intro-role-space {min-height:1.65em;font:400 clamp(2rem,4.6vw,5.5rem)/1.5 'Instrument Serif',serif;}
+.intro-role {display:inline-block;border-bottom:1px solid currentColor;line-height:1.15;padding-bottom:.08em;}
+.intro-role .physics-word {display:inline-block;white-space:nowrap;}
+.intro-role .physics-letter {display:inline-block;transform-origin:center;}
+.intro-bio p {font:400 clamp(1.7rem,3.5vw,4.5rem)/1.3 'Instrument Serif',serif;margin:.2em 0 0;}
+.intro-nav {position:absolute;inset:0;z-index:4;pointer-events:none;font:400 .8rem/1.4 'Barlow',sans-serif;letter-spacing:.05em;}
+.intro-nav a,.intro-nav button {pointer-events:auto;color:#fff;text-decoration:none;background:#0009;border:1px solid #ffffff30;border-radius:24px;padding:12px 20px;cursor:pointer;}
+.intro-nav a {position:absolute;top:24px;right:24px;}
+.intro-nav button {position:absolute;bottom:max(24px,env(safe-area-inset-bottom));left:50%;transform:translateX(-50%);white-space:nowrap;}
+.intro-nav a:focus-visible,.intro-nav button:focus-visible {outline:2px solid #fff;outline-offset:5px;}
+@media(max-width:700px){
+ .intro-first .intro-film {object-fit:contain;}
+ .intro-second .intro-film {object-fit:cover;opacity:.55;}
+ .intro-bio {width:94vw;margin:0;background:#2b2c26e8;padding:32px 10px;}
+ .intro-hello {font-size:clamp(3.2rem,12vw,5rem);}
+ .intro-role-space {font-size:clamp(2rem,8vw,3.2rem);}
+ .intro-bio p {font-size:clamp(1.7rem,7vw,2.6rem);}
+}
+@media(prefers-reduced-motion:reduce){.intro-role .physics-letter {transform:none!important;}}
+
+.intro-nav .intro-pause {top:24px;left:24px;bottom:auto;transform:none;}
+
+@media(max-width:700px){.intro-second .intro-film {object-position:76% center;opacity:.8;}.intro-bio {background:#2b2c26d9;}}

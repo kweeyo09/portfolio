@@ -6,6 +6,7 @@ import { Redirect, Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 
+const Introduction = lazy(() => import("./pages/Introduction"));
 const Home = lazy(() => import("./pages/Home"));
 const CoolThings = lazy(() => import("./pages/CoolThings"));
 const PaperArt = lazy(() => import("./pages/PaperArt"));
@@ -26,7 +27,7 @@ const ArmaniProject = lazy(() => import("./pages/ArmaniProject"));
 function Router() {
   return (
     <Switch>
-      <Route path={"/"} component={Home} />
+      <Route path={"/"} component={Introduction} />
       <Route path={"/flowers"} component={Home} />
       <Route path={"/cool-things"} component={CoolThings} />
       <Route path={"/paper-art"} component={PaperArt} />
