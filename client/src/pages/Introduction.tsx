@@ -5,7 +5,7 @@ import './Introduction.css';
 
 gsap.registerPlugin(ScrollTrigger);
 const Flowers = lazy(() => import('./Home'));
-const roles = ['a designer', 'a product designer', 'a vibecoder'];
+const roles = ['designer', 'vibecoder', 'matcha enthusiast'];
 
 function Letters({text}: {text: string}) {
   return <><span className="intro-sr-only">{text}</span><span aria-hidden="true">{Array.from(text).map((letter, index) => <span className="intro-letter" key={index}>{letter === ' ' ? '\u00a0' : letter}</span>)}</span></>;
