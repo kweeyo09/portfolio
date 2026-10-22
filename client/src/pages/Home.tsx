@@ -291,7 +291,7 @@ export default function Home() {
 
     /* ── KEYBOARD FALLBACK ── */
     const onKey = (e: KeyboardEvent) => {
-      if (renderer.domElement.getBoundingClientRect().top > 2) return;
+      if (renderer.domElement.closest('[inert]') || renderer.domElement.getBoundingClientRect().top > 2) return;
       if (e.code === 'Space') {
         e.preventDefault();
         const f = flowers[activeIdx];
@@ -353,7 +353,8 @@ export default function Home() {
     const onContextMenu = (e: MouseEvent) => e.preventDefault();
     let wheelCooldown = 0;
     const onWheel = (e: WheelEvent) => {
-      if (canvas.getBoundingClientRect().top > 2) return;
+      if (canvas.closest('[inert]') || canvas.getBoundingClientRect().top > 2) return;
+      if (!e.ctrlKey && e.deltaY < 0 && activeIdx === 0 && canvas.closest('.intro-sequence')) return;
       e.preventDefault();
       if (e.ctrlKey) {
         setZoom(zoom * Math.exp(-e.deltaY * 0.01));
