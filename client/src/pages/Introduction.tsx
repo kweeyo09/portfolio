@@ -47,6 +47,55 @@ export default function Introduction() {
     return () => media.removeEventListener('change', change);
   }, []);
 
+  useEffect(() => {
+    let tween: gsap.core.Tween | undefined;
+    let locked = false;
+    let releaseTimer = 0;
+    let touchY: number | null = null;
+    const end = () => root.current ? root.current.offsetTop + root.current.offsetHeight - window.innerHeight : 0;
+    const release = () => {
+      window.clearTimeout(releaseTimer);
+      if (!tween?.isActive()) releaseTimer = window.setTimeout(() => { locked = false; }, 180);
+    };
+    const reveal = () => {
+      locked = true;
+      const position = { y: window.scrollY };
+      tween = gsap.to(position, {
+        y: end(), duration: reduced ? 0 : .65, ease: 'power2.inOut',
+        onUpdate: () => window.scrollTo(0, position.y),
+        onComplete: () => { releaseTimer = window.setTimeout(() => { locked = false; }, 180); },
+      });
+    };
+    const wheel = (event: WheelEvent) => {
+      if (event.ctrlKey) return;
+      if (locked) {
+        event.preventDefault(); event.stopImmediatePropagation(); release(); return;
+      }
+      if (event.deltaY > 0 && window.scrollY < end() - 2) {
+        event.preventDefault(); event.stopImmediatePropagation(); reveal();
+      }
+    };
+    const touchStart = (event: TouchEvent) => {
+      touchY = event.touches.length === 1 ? event.touches[0].clientY : null;
+    };
+    const touchMove = (event: TouchEvent) => {
+      if (event.touches.length !== 1) return;
+      if (locked) { event.preventDefault(); release(); return; }
+      if (touchY !== null && touchY - event.touches[0].clientY > 12 && window.scrollY < end() - 2) {
+        event.preventDefault(); touchY = null; reveal();
+      }
+    };
+    window.addEventListener('wheel', wheel, {passive: false, capture: true});
+    window.addEventListener('touchstart', touchStart, {passive: true});
+    window.addEventListener('touchmove', touchMove, {passive: false});
+    return () => {
+      tween?.kill(); window.clearTimeout(releaseTimer);
+      window.removeEventListener('wheel', wheel, true);
+      window.removeEventListener('touchstart', touchStart);
+      window.removeEventListener('touchmove', touchMove);
+    };
+  }, [reduced]);
+
   useLayoutEffect(() => {
     const context = gsap.context(() => {
       const timeline = gsap.timeline({scrollTrigger: {
