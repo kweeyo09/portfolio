@@ -20,7 +20,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import SocialLinks from '../components/SocialLinks';
 import * as THREE from 'three';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
@@ -186,12 +186,8 @@ export default function Home() {
     const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(CAMERA_FOV, window.innerWidth / window.innerHeight, 0.01, 200);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.08;
-    controls.minDistance = 1.5;
-    controls.maxDistance = 20;
-    controls.target.set(0, 0, 0);
+    renderer.domElement.style.touchAction = 'none';
+    let zoom = 1;
 
     /* ── FLOWER STATE ── */
     type FlowerState = {
@@ -217,7 +213,7 @@ export default function Home() {
     let camTargetX  = FLOWER_X[0];
     let camCurrentX = FLOWER_X[0];
     camera.position.set(FLOWER_X[0], 0, cameraDistance(camera.aspect));
-    controls.target.set(FLOWER_X[0], 0, 0);
+    camera.lookAt(FLOWER_X[0], 0, 0);
 
     const clock = new THREE.Clock();
 
@@ -278,8 +274,7 @@ export default function Home() {
       if (dir === 'left')  activeIdx = (activeIdx - 1 + N_FLOWERS) % N_FLOWERS;
       else                 activeIdx = (activeIdx + 1) % N_FLOWERS;
       camTargetX = FLOWER_X[activeIdx];
-      controls.enabled = false;
-      setTimeout(() => { controls.enabled = true; }, 1200);
+
       updateLabel();
     };
 
@@ -310,55 +305,74 @@ export default function Home() {
     };
     window.addEventListener('keydown', onKey);
 
-    /* ── MOUSE WHEEL: cycle flowers ── */
-    let wheelCooldown = 0;
-    const onWheel = (e: WheelEvent) => {
-      // Only cycle if not zooming (ctrl key = pinch-zoom on trackpad)
-      if (e.ctrlKey) return;
-      const now = Date.now();
-      if (now < wheelCooldown) return;
-      wheelCooldown = now + 700;
-      if (e.deltaY > 0 || e.deltaX > 0) switchFlower('right');
-      else switchFlower('left');
-    };
-    renderer.domElement.addEventListener('wheel', onWheel, { passive: true });
-
-    /* ── TOUCH SWIPE: cycle flowers on mobile ── */
-    let touchStartX = 0;
-    let touchStartY = 0;
-    let touchCooldown = 0;
-    const onTouchStart = (e: TouchEvent) => {
-      touchStartX = e.touches[0].clientX;
-      touchStartY = e.touches[0].clientY;
-    };
-    const onTouchEnd = (e: TouchEvent) => {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-      const deltaX = touchEndX - touchStartX;
-      const deltaY = touchEndY - touchStartY;
-      const now = Date.now();
-      if (now < touchCooldown) return;
-      // Require at least 50px swipe and more horizontal than vertical
-      if (Math.abs(deltaX) > 50 && Math.abs(deltaX) > Math.abs(deltaY)) {
-        touchCooldown = now + 700;
-        if (deltaX < 0) switchFlower('right');
-        else switchFlower('left');
-      }
-    };
-    renderer.domElement.addEventListener('touchstart', onTouchStart, { passive: true });
-    renderer.domElement.addEventListener('touchend', onTouchEnd, { passive: true });
-
-    /* ── CANVAS CLICK / TAP: scatter particles ── */
-    // Taps also fire click, so touchend isn't needed; a drag to orbit shouldn't count
+    /* ── GESTURES: drag spins; only pinch changes zoom ── */
+    const canvas = renderer.domElement;
+    const pointers = new Map<number, { x: number; y: number }>();
+    let suppressClick = false;
     let pointerDownX = 0;
     let pointerDownY = 0;
     let leaving = false;
-    const onPointerDown = (e: PointerEvent) => {
-      pointerDownX = e.clientX;
-      pointerDownY = e.clientY;
+    const setZoom = (value: number) => { zoom = THREE.MathUtils.clamp(value, 0.65, 2.5); };
+    const pinchDistance = () => {
+      const [a, b] = Array.from(pointers.values());
+      return a && b ? Math.hypot(a.x - b.x, a.y - b.y) : 0;
     };
+    const onPointerDown = (e: PointerEvent) => {
+      if (e.pointerType === 'mouse' && e.button !== 0 && e.button !== 2) return;
+      if (pointers.size === 0) {
+        suppressClick = false;
+        pointerDownX = e.clientX;
+        pointerDownY = e.clientY;
+      }
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size > 1) suppressClick = true;
+      canvas.setPointerCapture(e.pointerId);
+    };
+    const onPointerMove = (e: PointerEvent) => {
+      const previous = pointers.get(e.pointerId);
+      if (!previous) return;
+      const before = pinchDistance();
+      const dx = e.clientX - previous.x;
+      pointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      if (pointers.size === 2) {
+        const after = pinchDistance();
+        if (before > 0 && after > 0) setZoom(zoom * after / before);
+        suppressClick = true;
+      } else if (pointers.size === 1) {
+        const flower = flowers[activeIdx].points;
+        if (flower) flower.rotation.y += dx * 0.008;
+        if (Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY) > 8) suppressClick = true;
+      }
+    };
+    const onPointerUp = (e: PointerEvent) => {
+      if (e.type === 'pointercancel') suppressClick = true;
+      pointers.delete(e.pointerId);
+      if (canvas.hasPointerCapture(e.pointerId)) canvas.releasePointerCapture(e.pointerId);
+    };
+    const onContextMenu = (e: MouseEvent) => e.preventDefault();
+    let wheelCooldown = 0;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      if (e.ctrlKey) {
+        setZoom(zoom * Math.exp(-e.deltaY * 0.01));
+        suppressClick = true;
+        return;
+      }
+      if (pointers.size || (!e.deltaX && !e.deltaY)) return;
+      const now = Date.now();
+      if (now < wheelCooldown) return;
+      wheelCooldown = now + 700;
+      const delta = Math.abs(e.deltaX) > Math.abs(e.deltaY) ? e.deltaX : e.deltaY;
+      switchFlower(delta > 0 ? 'right' : 'left');
+    };
+    canvas.addEventListener('wheel', onWheel, { passive: false });
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
+    canvas.addEventListener('lostpointercapture', onPointerUp);
+    canvas.addEventListener('contextmenu', onContextMenu);
     const onCanvasClick = (e: MouseEvent) => {
-      if (leaving || Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY) > 8) return;
+      if (leaving || suppressClick || Math.hypot(e.clientX - pointerDownX, e.clientY - pointerDownY) > 8) return;
       const f = flowers[activeIdx];
       if (f.targetProgress > 0.5) {
         f.targetProgress = 0;
@@ -394,8 +408,8 @@ export default function Home() {
       const panLerp = 1 - Math.pow(0.04, dt);
       camCurrentX += (camTargetX - camCurrentX) * panLerp;
       camera.position.x = camCurrentX;
-      controls.target.x = camCurrentX;
-      controls.update();
+      camera.position.z = cameraDistance(camera.aspect) / zoom;
+      camera.lookAt(camCurrentX, 0, 0);
 
       for (const f of flowers) {
         if (!f.mat || !f.points) continue;
@@ -404,7 +418,7 @@ export default function Home() {
         f.progress = Math.max(0, Math.min(1, f.progress));
         f.mat.uniforms.uProgress.value = f.progress;
         f.mat.uniforms.uTime.value     = time;
-        f.points.rotation.y += dt * 0.18;
+        if (!pointers.size) f.points.rotation.y += dt * 0.18;
       }
 
       renderer.render(scene, camera);
@@ -416,8 +430,7 @@ export default function Home() {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       // Pull back on narrow screens so the whole flower stays in frame
-      const offset = camera.position.clone().sub(controls.target);
-      camera.position.copy(controls.target).add(offset.setLength(cameraDistance(camera.aspect)));
+      camera.position.z = cameraDistance(camera.aspect) / zoom;
       renderer.setSize(window.innerWidth, window.innerHeight);
     };
     window.addEventListener('resize', onResize);
@@ -432,10 +445,13 @@ export default function Home() {
       renderer.domElement.removeEventListener('wheel', onWheel);
       renderer.domElement.removeEventListener('pointerdown', onPointerDown);
       renderer.domElement.removeEventListener('click', onCanvasClick);
-      renderer.domElement.removeEventListener('touchstart', onTouchStart);
-      renderer.domElement.removeEventListener('touchend', onTouchEnd);
+      canvas.removeEventListener('pointermove', onPointerMove);
+      canvas.removeEventListener('pointerup', onPointerUp);
+      canvas.removeEventListener('pointercancel', onPointerUp);
+      canvas.removeEventListener('lostpointercapture', onPointerUp);
+      canvas.removeEventListener('contextmenu', onContextMenu);
 
-      controls.dispose();
+
       renderer.dispose();
       for (const f of flowers) {
         if (f.points) { scene.remove(f.points); f.points.geometry.dispose(); }
@@ -476,7 +492,7 @@ export default function Home() {
           fontSize: 'clamp(0.7rem, 2.5vw, 0.9rem)', letterSpacing: '0.1em', fontWeight: '400',
           flexWrap: 'wrap', justifyContent: 'center',
         }}>
-          <span>Scroll / swipe</span>
+          <span>Scroll / next</span>
           <div style={{
             width: '20px', height: '28px', border: '1px solid rgba(255,255,255,0.5)',
             borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center',
@@ -495,7 +511,7 @@ export default function Home() {
           color: 'rgba(255,255,255,0.75)', fontFamily: "'Barlow', sans-serif",
           fontSize: 'clamp(0.65rem, 2vw, 0.85rem)', letterSpacing: '0.1em', fontWeight: '300',
         }}>
-          Click / tap to scatter
+          Drag to spin · Pinch to zoom · Tap to open
         </div>
       </div>
 
