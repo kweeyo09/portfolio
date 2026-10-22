@@ -1,11 +1,12 @@
 /**
  * 瑶草琪花 · KIXIZ STUDIO
- * Three-flower Particle Bloom
+ * Four-flower Particle Bloom
  *
  * Flowers (left → right):
- *   0 百合   (Lily)        → UI/UX design
- *   1 莲花   (Lotus)       → Graphic & Campaign
- *   2 花烛   (Anthurium)   → Motion Graphics
+ *   0 Dahlia → Cool things I have been working on
+ *   1 Lily → UI/UX design
+ *   2 Lotus → Graphic & Campaign
+ *   3 Anthurium → Motion Graphics
  *
  * Keyboard fallback:
  *   Space bar / ← →   → scatter / cycle
@@ -23,10 +24,10 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
+  '/assets/flower-experiments-dahlia-v2.bin',
   '/assets/flower-lily_dbe070b1.bin',
   '/assets/flower-lotus_439ad204.bin',
   '/assets/flower-anthurium_1c7fe559.bin',
-  '/assets/flower-experiments-v1.bin',
 ];
 // Must match POS_SCALE in scripts/bake-flowers.py
 const POS_SCALE = 1 / 8192;
@@ -43,8 +44,8 @@ const loadFlowerData = () => {
   return flowerData;
 };
 
-const FLOWER_EN = ['UI/UX design', 'Graphic & Campaign', 'Motion Graphics', "Cool things I've been working on"];
-const PORTFOLIO_ROUTES = ['/ui-design', '/graphic-campaign', '/3d-motion', '/cool-things'];
+const FLOWER_EN = ["Cool things I've been working on", 'UI/UX design', 'Graphic & Campaign', 'Motion Graphics'];
+const PORTFOLIO_ROUTES = ['/cool-things', '/ui-design', '/graphic-campaign', '/3d-motion'];
 const prefetchRoutes = () => {
   void import('./UIDesign');
   void import('./GraphicCampaign');

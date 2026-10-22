@@ -1,6 +1,6 @@
 # Paper in Bloom on kixizz.com
 
-The fourth homepage flower opens `/cool-things`. That page links to the studio at `/paper-art`.
+The first homepage flower opens `/cool-things`. That page links to the studio at `/paper-art`.
 The studio is embedded from `/paper-art-studio/index.html` and ships with the existing portfolio deployment. No additional Vercel project or Git branch is required.
 
 The editable source remains in https://github.com/kweeyo09/paper-art. The portfolio contains a static copy so production builds do not depend on fetching another repository. `client/public/paper-art-studio/SOURCE.json` records the copied commit.
