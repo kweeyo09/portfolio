@@ -1,11 +1,11 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
-import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
 import './Introduction.css';
 
-gsap.registerPlugin(ScrollTrigger);
+
 const Flowers = lazy(() => import('./Home'));
-const roles = ['designer', 'vibecoder', 'matcha enthusiast'];
+const roles = ['a vibe coder', 'a designer', 'a matcha enthusiast'];
 
 function Letters({text}: {text: string}) {
   return <><span className="intro-sr-only">{text}</span><span aria-hidden="true">{Array.from(text).map((letter, index) => <span className="intro-letter" key={index}>{letter === ' ' ? '\u00a0' : letter}</span>)}</span></>;
@@ -47,70 +47,67 @@ export default function Introduction() {
     return () => media.removeEventListener('change', change);
   }, []);
 
-  useEffect(() => {
-    let tween: gsap.core.Tween | undefined;
-    let locked = false;
-    let releaseTimer = 0;
+  useLayoutEffect(() => {
+    let started = false;
+    let complete = false;
     let touchY: number | null = null;
-    const end = () => root.current ? root.current.offsetTop + root.current.offsetHeight - window.innerHeight : 0;
-    const release = () => {
-      window.clearTimeout(releaseTimer);
-      if (!tween?.isActive()) releaseTimer = window.setTimeout(() => { locked = false; }, 180);
-    };
+    let lastGesture = 0;
+    let timeline: gsap.core.Timeline;
+    const context = gsap.context(() => {
+      timeline = gsap.timeline({paused: true, onComplete: () => {
+        complete = true;
+        lastGesture = performance.now();
+        setReady(true);
+      }});
+      if (reduced) {
+        timeline.to('.intro-copy', {opacity: 0, duration: .15}, 0);
+        timeline.to('.intro-flowers', {opacity: 1, duration: .15}, 0);
+      } else {
+        timeline.to('.intro-line-inner', {
+          yPercent: -105, duration: .65, stagger: .055, ease: 'power2.inOut',
+        }, 0);
+        timeline.to('.intro-flowers', {opacity: 1, duration: .34, ease: 'power1.out'}, .42);
+      }
+    }, root);
     const reveal = () => {
-      locked = true;
-      const position = { y: window.scrollY };
-      tween = gsap.to(position, {
-        y: end(), duration: reduced ? 0 : .65, ease: 'power2.inOut',
-        onUpdate: () => window.scrollTo(0, position.y),
-        onComplete: () => { releaseTimer = window.setTimeout(() => { locked = false; }, 180); },
-      });
+      if (started) return;
+      started = true;
+      setTextActive(false);
+      timeline.play(0);
     };
     const wheel = (event: WheelEvent) => {
-      if (event.ctrlKey) return;
-      if (locked) {
-        event.preventDefault(); event.stopImmediatePropagation(); release(); return;
-      }
-      if (event.deltaY > 0 && window.scrollY < end() - 2) {
-        event.preventDefault(); event.stopImmediatePropagation(); reveal();
-      }
+      if (event.ctrlKey || event.deltaY === 0) return;
+      const now = performance.now();
+      if (complete && now - lastGesture > 220) return;
+      lastGesture = now;
+      event.preventDefault();
+      event.stopImmediatePropagation();
+      if (event.deltaY > 0) reveal();
     };
     const touchStart = (event: TouchEvent) => {
       touchY = event.touches.length === 1 ? event.touches[0].clientY : null;
     };
     const touchMove = (event: TouchEvent) => {
-      if (event.touches.length !== 1) return;
-      if (locked) { event.preventDefault(); release(); return; }
-      if (touchY !== null && touchY - event.touches[0].clientY > 12 && window.scrollY < end() - 2) {
-        event.preventDefault(); touchY = null; reveal();
-      }
+      if (complete || event.touches.length !== 1) return;
+      event.preventDefault();
+      if (touchY !== null && touchY - event.touches[0].clientY > 8) reveal();
+    };
+    const keyDown = (event: KeyboardEvent) => {
+      if (complete || !['ArrowDown', 'PageDown', 'Space'].includes(event.code)) return;
+      event.preventDefault(); event.stopImmediatePropagation(); reveal();
     };
     window.addEventListener('wheel', wheel, {passive: false, capture: true});
     window.addEventListener('touchstart', touchStart, {passive: true});
     window.addEventListener('touchmove', touchMove, {passive: false});
+    window.addEventListener('keydown', keyDown, true);
     return () => {
-      tween?.kill(); window.clearTimeout(releaseTimer);
+      context.revert();
       window.removeEventListener('wheel', wheel, true);
       window.removeEventListener('touchstart', touchStart);
       window.removeEventListener('touchmove', touchMove);
+      window.removeEventListener('keydown', keyDown, true);
     };
   }, [reduced]);
-
-  useLayoutEffect(() => {
-    const context = gsap.context(() => {
-      const timeline = gsap.timeline({scrollTrigger: {
-        trigger: root.current, start: 'top top', end: 'bottom bottom', scrub: true,
-        onUpdate: self => { setReady(self.progress >= .999); setTextActive(self.progress === 0); },
-      }});
-      if (reduced) {
-        timeline.to('.intro-copy', {opacity: 0, duration: 1, ease: 'none'}, 0);
-      } else {
-        timeline.to('.intro-line-inner', {yPercent: -100, duration: .8, stagger: .1, ease: 'none'}, 0);
-      }
-      timeline.fromTo('.intro-flowers', {opacity: 0}, {opacity: 1, duration: .35, ease: 'none'}, .65);    }, root);
-    return () => context.revert();
-  }, [reduced]);
-
   return <main className="intro-sequence intro-slide" ref={root}>
     <div className="intro-stage">
       <section className="intro-flowers" aria-label="Explore my work" inert={!ready}>
@@ -118,7 +115,7 @@ export default function Introduction() {
       </section>
       <section className="intro-overlay" aria-label="About Kiki" aria-hidden={ready}>
         <div className="intro-copy">
-          <h1 className="intro-line"><span className="intro-line-inner"><Letters text="Hi, I’m Kiki." /></span></h1>
+          <h1 className="intro-line"><span className="intro-line-inner"><Letters text="Hi, I’m Kiki," /></span></h1>
           <p className="intro-line intro-role-line"><span className="intro-line-inner"><HighlightRole active={textActive} reduced={reduced} /></span></p>
           <p className="intro-line intro-location"><span className="intro-line-inner"><Letters text="based in London." /></span></p>
         </div>
@@ -126,3 +123,4 @@ export default function Introduction() {
     </div>
   </main>;
 }
+

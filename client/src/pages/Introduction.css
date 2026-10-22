@@ -1,4 +1,4 @@
-.intro-sequence {position:relative;height:200svh;background:#000;color:#fff;}
+.intro-sequence {position:relative;height:100svh;background:#000;color:#fff;}
 .intro-stage {position:sticky;top:0;height:100svh;overflow:hidden;}
 .intro-flowers {position:absolute;inset:0;opacity:0;}
 .intro-overlay {position:absolute;inset:0;display:grid;place-items:center;pointer-events:none;padding:32px;}
@@ -21,3 +21,4 @@
  .intro-line {font-size:clamp(1.8rem,8.4vw,3rem);}
 }
 @media(prefers-reduced-motion:reduce){.intro-role,.intro-role::before {transition:none;}}
+
