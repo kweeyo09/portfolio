@@ -31,6 +31,7 @@ FLOWERS = [
     ("baihe_4774bde5.glb", "flower-lily"),
     ("lotus_f4ee305b.glb", "flower-lotus"),
     ("anthurium_f0a39f13.glb", "flower-anthurium"),
+    ("hibiscus.glb", "flower-hibiscus"),
 ]
 
 N_PARTICLES = 60_000
@@ -146,4 +147,4 @@ def bake(src, dst, rng):
 if __name__ == "__main__":
     rng = np.random.default_rng(7)
     for src, dst in FLOWERS:
-        bake(src, dst, rng)
+        bake(src, dst, np.random.default_rng(7) if dst == "flower-hibiscus" else rng)

@@ -3,7 +3,7 @@
  * Four-flower Particle Bloom
  *
  * Flowers (left → right):
- *   0 Dahlia → Cool things I have been working on
+ *   0 Hibiscus → Cool things I have been working on
  *   1 Lily → UI/UX design
  *   2 Lotus → Graphic & Campaign
  *   3 Anthurium → Motion Graphics
@@ -24,7 +24,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
-  '/assets/flower-experiments-dahlia-v2.bin',
+  '/assets/flower-hibiscus_06dd1d06.bin',
   '/assets/flower-lily_dbe070b1.bin',
   '/assets/flower-lotus_439ad204.bin',
   '/assets/flower-anthurium_1c7fe559.bin',
@@ -451,7 +451,7 @@ export default function Home() {
       {/* Flower label */}
       <div ref={labelRef} style={{
         // Sits in the top band; the flowers are drawn below it (FLOWER_Y)
-        position: 'absolute', top: 'clamp(84px, 15vh, 160px)', left: '50%',
+        position: 'absolute', top: 'clamp(124px, 17vh, 160px)', left: '50%',
         transform: 'translateX(-50%)', width: 'min(92vw, 760px)', whiteSpace: 'normal',
         color: '#fff', fontFamily: "'Instrument Serif', serif", fontStyle: 'italic',
         textAlign: 'center', pointerEvents: 'none', userSelect: 'none',
@@ -514,7 +514,7 @@ export default function Home() {
       `}</style>
 
       {/* Studio mark */}
-      <div style={{
+      <a href="/" aria-label="KIXIZZ Studio home" style={{
         position: 'absolute', top: 'max(12px, env(safe-area-inset-top))', left: 'max(12px, env(safe-area-inset-left))',
         zIndex: 1000,
       }}>
@@ -527,7 +527,7 @@ export default function Home() {
             opacity: 0.9,
           }}
         />
-      </div>
+      </a>
 
       {/* Social profiles */}
       <div style={{
@@ -539,7 +539,7 @@ export default function Home() {
         <div aria-hidden="true" style={{ pointerEvents: 'none' }}>
           <svg
             className="github-doodle"
-            width="44" height="46" viewBox="0 0 44 46"
+            width="28" height="28" viewBox="0 0 44 46"
             fill="none" stroke="#f8f5ef" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"
             style={{ position: 'absolute', top: 'calc(100% + 4px)', right: 61, opacity: 0.85 }}
           >
@@ -549,10 +549,10 @@ export default function Home() {
           <span
             className="github-doodle-text"
             style={{
-              position: 'absolute', top: 'calc(100% + 40px)', right: 102,
+              position: 'absolute', top: 'calc(100% + 30px)', right: 8,
               whiteSpace: 'nowrap', color: '#f8f5ef',
               fontFamily: "'Caveat', cursive", fontWeight: 600,
-              fontSize: 'clamp(1.15rem, 3.6vw, 1.45rem)', lineHeight: 1,
+              fontSize: '1.15rem', lineHeight: 1,
               transform: 'rotate(-5deg)', transformOrigin: 'right center',
             }}
           >
