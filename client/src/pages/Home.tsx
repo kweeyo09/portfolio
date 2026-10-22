@@ -3,9 +3,9 @@
  * Four-flower Particle Bloom
  *
  * Flowers (left → right):
- *   0 Rose → Cool things I have been working on
+ *   0 Lotus → Cool things I have been working on
  *   1 Lily → UI/UX design
- *   2 Lotus → Graphic & Campaign
+ *   2 Rose → Graphic & Campaign
  *   3 Anthurium → Motion Graphics
  *
  * Keyboard fallback:
@@ -24,13 +24,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
-  '/assets/flower-rose_824d2395.bin',
-  '/assets/flower-lily_dbe070b1.bin',
   '/assets/flower-lotus_439ad204.bin',
+  '/assets/flower-lily_dbe070b1.bin',
+  '/assets/flower-rose_824d2395.bin',
   '/assets/flower-anthurium_1c7fe559.bin',
 ];
 // Must match POS_SCALE in scripts/bake-flowers.py
 const POS_SCALE = 1 / 8192;
+// Optical scale: compensate for sparse petals and slender silhouettes in world space.
+// Lotus retains its original flat orientation; all models use the same camera.
+const FLOWER_VISUAL_SCALES = [1, 1.1, 1.05, 1.2];
 
 // Started once per session, so returning to the homepage is instant
 let flowerData: Promise<ArrayBuffer>[] | null = null;
@@ -240,6 +243,7 @@ export default function Home() {
         });
 
         const points = new THREE.Points(geo, mat);
+        points.scale.setScalar(FLOWER_VISUAL_SCALES[idx]);
         points.frustumCulled = false;
         points.visible = true;
         points.position.set(FLOWER_X[idx], FLOWER_Y, 0);
