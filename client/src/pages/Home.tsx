@@ -3,9 +3,9 @@
  * Four-flower Particle Bloom
  *
  * Flowers (left → right):
- *   0 Lotus → Cool things I have been working on
+ *   0 Pomegranate → Cool things I have been working on
  *   1 Lily → UI/UX design
- *   2 Rose → Graphic & Campaign
+ *   2 Lotus → Graphic & Campaign
  *   3 Anthurium → Motion Graphics
  *
  * Keyboard fallback:
@@ -24,16 +24,16 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
-  '/assets/flower-lotus_439ad204.bin',
+  '/assets/flower-pomegranate_a0e03fde.bin',
   '/assets/flower-lily_dbe070b1.bin',
-  '/assets/flower-rose_824d2395.bin',
+  '/assets/flower-lotus_439ad204.bin',
   '/assets/flower-anthurium_1c7fe559.bin',
 ];
 // Must match POS_SCALE in scripts/bake-flowers.py
 const POS_SCALE = 1 / 8192;
 // Optical scale: compensate for sparse petals and slender silhouettes in world space.
 // Lotus retains its original flat orientation; all models use the same camera.
-const FLOWER_VISUAL_SCALES = [1, 1.1, 1.05, 1.2];
+const FLOWER_VISUAL_SCALES = [1.15, 1.1, 1, 1.2];
 
 // Started once per session, so returning to the homepage is instant
 let flowerData: Promise<ArrayBuffer>[] | null = null;
