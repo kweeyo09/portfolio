@@ -262,11 +262,8 @@ export default function Home() {
     /* ── LABEL UPDATE ── */
     const updateLabel = () => {
       if (!labelRef.current) return;
-      const prevIdx = (activeIdx - 1 + N_FLOWERS) % N_FLOWERS;
-      const nextIdx = (activeIdx + 1) % N_FLOWERS;
       labelRef.current.innerHTML =
-        `<span style="font-size:clamp(1.7rem,7vw,2.2rem);letter-spacing:0.08em;font-weight:normal;color:#fff;font-family:'Instrument Serif',serif;font-style:italic">${FLOWER_EN[activeIdx]}</span>` +
-        `<span style="display:block;font-size:clamp(0.72rem,3.2vw,0.9rem);letter-spacing:0.15em;opacity:0.4;margin-top:14px;font-family:'Barlow',sans-serif;font-weight:300">← ${FLOWER_EN[prevIdx]} · ${FLOWER_EN[nextIdx]} →</span>`;
+        `<span style="font-size:clamp(1.7rem,7vw,2.2rem);letter-spacing:0.08em;font-weight:normal;color:#fff;font-family:'Instrument Serif',serif;font-style:italic">${FLOWER_EN[activeIdx]}</span>`;
     };
     updateLabel();
 
@@ -489,27 +486,6 @@ export default function Home() {
         pointerEvents: 'none',
         padding: '0 16px',
       }}>
-        {/* Scroll instruction row - responsive */}
-        <div style={{
-          display: 'flex', alignItems: 'center', gap: 'clamp(16px, 5vw, 40px)',
-          color: 'rgba(255,255,255,0.85)', fontFamily: "'Barlow', sans-serif",
-          fontSize: 'clamp(0.7rem, 2.5vw, 0.9rem)', letterSpacing: '0.1em', fontWeight: '400',
-          flexWrap: 'wrap', justifyContent: 'center',
-        }}>
-          <span>Scroll / next</span>
-          <div style={{
-            width: '20px', height: '28px', border: '1px solid rgba(255,255,255,0.5)',
-            borderRadius: '10px', display: 'flex', alignItems: 'center', justifyContent: 'center',
-            position: 'relative', flexShrink: 0,
-          }}>
-            <div style={{
-              width: '2px', height: '5px', background: 'rgba(255,255,255,0.7)',
-              borderRadius: '1px',
-              animation: 'scroll-bounce 2s infinite',
-            }} />
-          </div>
-          <span>to explore</span>
-        </div>
         {/* Click instruction */}
         <div style={{
           color: 'rgba(255,255,255,0.75)', fontFamily: "'Barlow', sans-serif",
@@ -520,10 +496,6 @@ export default function Home() {
       </div>
 
       <style>{`
-        @keyframes scroll-bounce {
-          0%, 100% { transform: translateY(0); opacity: 1; }
-          50% { transform: translateY(6px); opacity: 0.3; }
-        }
         @keyframes doodle-draw { to { stroke-dashoffset: 0; } }
         @keyframes doodle-fade { to { opacity: 0.85; } }
         .github-doodle path {
