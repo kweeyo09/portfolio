@@ -20,6 +20,7 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import SocialLinks from '../components/SocialLinks';
 import * as THREE from 'three';
+import './Home.css';
 
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
@@ -467,7 +468,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div style={{ width: '100%', height: '100vh', background: '#000', overflow: 'hidden', position: 'relative' }}>
+    <div className="flower-home" style={{ width: '100%', background: '#000', overflow: 'hidden', position: 'relative' }}>
       {/* Three.js canvas mount */}
       <div ref={mountRef} style={{ position: 'absolute', inset: 0 }} />
 
@@ -482,8 +483,8 @@ export default function Home() {
       }} />
 
       {/* Centered bottom instructions - responsive */}
-      <div style={{
-        position: 'absolute', bottom: 'max(40px, env(safe-area-inset-bottom))', left: '50%', transform: 'translateX(-50%)',
+      <div className="flower-instructions" style={{
+        position: 'absolute', left: '50%', transform: 'translateX(-50%)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 'clamp(12px, 3vw, 20px)',
         pointerEvents: 'none',
         padding: '0 16px',
@@ -586,15 +587,13 @@ export default function Home() {
 
       {/* NEXT button - bottom right */}
       <button
-        className="liquid-glass-strong"
+        className="liquid-glass-strong flower-next"
         onClick={() => {
           const event = new KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight' });
           window.dispatchEvent(event);
         }}
         style={{
           position: 'absolute',
-          bottom: 'max(32px, env(safe-area-inset-bottom))',
-          right: 'max(32px, env(safe-area-inset-right))',
           borderRadius: 8,
           color: '#fff',
           fontFamily: "'Barlow', sans-serif",

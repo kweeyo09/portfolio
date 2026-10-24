@@ -1,0 +1,28 @@
+.flower-home {
+  height: 100vh;
+  height: 100svh;
+}
+
+.flower-instructions {
+  bottom: max(40px, env(safe-area-inset-bottom));
+}
+
+.flower-next {
+  bottom: max(32px, env(safe-area-inset-bottom));
+  right: max(32px, env(safe-area-inset-right));
+  min-height: 44px;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .flower-instructions {
+    width: 100%;
+    bottom: calc(80px + env(safe-area-inset-bottom, 0px));
+  }
+
+  .flower-next {
+    bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+    right: max(16px, env(safe-area-inset-right));
+    min-width: 88px;
+  }
+}
