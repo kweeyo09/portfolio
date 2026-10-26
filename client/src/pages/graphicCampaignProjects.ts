@@ -20,6 +20,26 @@ export interface CampaignProject {
 
 export const CAMPAIGN_PROJECTS: CampaignProject[] = [
   {
+    slug: '8x-merch',
+    title: '8x Merch Drop',
+    eyebrow: 'Live Brief · Merchandise',
+    description:
+      'A merchandise collection for 8x inspired by the everyday rituals of content creation. Five T-shirt designs, retro SD card keychains, phone charms and two sticker sheets bring together navy and coral graphics, halftone imagery and production-room humour.',
+    layout: 'stack',
+    media: [
+      { src: '/assets/8x-merch-lifestyle_b66ddfcb.webp', alt: '8x Unscripted and Field Kit T-shirts worn by two models' },
+      { src: '/assets/8x-merch-lit-from-the-front_670472c6.webp', alt: 'Lit From the Front — white 8x T-shirt front and back with a navy ring light and coral phone graphic' },
+      { src: '/assets/8x-merch-just-one-more_d4f051a5.webp', alt: 'Just One More — white 8x T-shirt front and back with navy and coral looping graphics' },
+      { src: '/assets/8x-merch-your-brief-their-lens_384d3c4a.webp', alt: 'Your Brief, Their Lens — white 8x T-shirt front and back with a halftone camera lens' },
+      { src: '/assets/8x-merch-field-kit_e4db291f.webp', alt: 'Field Kit — white 8x T-shirt front and back with a phone and coral clip-on microphone' },
+      { src: '/assets/8x-merch-unscripted_414d9ea4.webp', alt: 'Unscripted — white 8x T-shirt front and back with stacked navy lettering and coral framing marks' },
+      { src: '/assets/8x-merch-sd-card-keychain_3cc0c655.webp', alt: 'Retro 8x SD card keychain, front and back, with a pixel-style recording label' },
+      { src: '/assets/8x-merch-phone-charms_a3d1b7db.webp', alt: 'Black acrylic 8x phone charms, front and back, with a retro boot screen and white logo' },
+      { src: '/assets/8x-merch-production-office-stickers_083dd28e.webp', alt: '8x Production Office sticker sheet with a clapperboard, recording icons and creator in-jokes' },
+      { src: '/assets/8x-merch-retro-os-stickers_edca5e5f.webp', alt: '8x Retro OS sticker sheet with pixel cursors, export windows and editing graphics' },
+    ],
+  },
+  {
     slug: 'playdoh',
     title: 'Play-Doh: Go Play With Your Food',
     eyebrow: 'Social Campaign · Hasbro',
@@ -78,17 +98,6 @@ export const CAMPAIGN_PROJECTS: CampaignProject[] = [
       { src: '/assets/hk-zine-04_a8f0add5.webp', alt: 'Zine no. 01 — "slow / stop" road markings in safety orange over an ultramarine halftone street' },
       { src: '/assets/hk-zine-05_34ed38e4.webp', alt: 'Field Note 07 — green halftone of tree branches forking against the sky' },
       { src: '/assets/hk-zine-06_a04ae5d6.webp', alt: 'Hong Kong postcard, Causeway Bay — cobalt halftone street with a terracotta handwritten note' },
-    ],
-  },
-  {
-    slug: 'landscape-flower-and-bird',
-    title: 'Landscape Flower and Bird',
-    eyebrow: 'Personal Project · Graphic',
-    description:
-      'A reworking of a traditional Chinese flower-and-bird painting — peach blossom, brushwork calligraphy and seal stamps pushed into hot pink and acid green.',
-    layout: 'stack',
-    media: [
-      { src: '/assets/flowerbird_c6c020a4.webp', alt: 'Peach blossom painting with calligraphy in pink and green' },
     ],
   },
 ];
