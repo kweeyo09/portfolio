@@ -1,37 +1,14 @@
 import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import gsap from 'gsap';
+import IntroRole from '../components/IntroRole';
 
 import './Introduction.css';
 
 
 const Flowers = lazy(() => import('./Home'));
-const roles = ['a designer', 'a vibe coder', 'a matcha enthusiast'];
 
 function Letters({text}: {text: string}) {
   return <><span className="intro-sr-only">{text}</span><span aria-hidden="true">{Array.from(text).map((letter, index) => <span className="intro-letter" key={index}>{letter === ' ' ? '\u00a0' : letter}</span>)}</span></>;
-}
-
-function HighlightRole({active, reduced}: {active: boolean; reduced: boolean}) {
-  const [index, setIndex] = useState(0);
-  const [selected, setSelected] = useState(false);
-  useEffect(() => {
-    if (!active || reduced) return;
-    let timer: number;
-    const schedule = () => {
-      timer = window.setTimeout(() => {
-        if (document.hidden) { schedule(); return; }
-        setSelected(true);
-        timer = window.setTimeout(() => {
-          setIndex(value => (value + 1) % roles.length);
-          timer = window.setTimeout(() => { setSelected(false); schedule(); }, 180);
-        }, 180);
-      }, 1200);
-    };
-    setSelected(false);
-    schedule();
-    return () => window.clearTimeout(timer);
-  }, [active, reduced]);
-  return <span className={`intro-role${selected && active ? ' is-selected' : ''}`}>{roles[index]}</span>;
 }
 
 export default function Introduction() {
@@ -122,12 +99,12 @@ export default function Introduction() {
           <p className="intro-line intro-role-line"><span className="intro-line-inner">
             <span className="intro-punctuation" aria-hidden="true">(</span>
             <span className="intro-object intro-keyboard" aria-hidden="true"><img src="/assets/0001_655eb5c3.webp" alt="" /></span>
-            <HighlightRole active={textActive} reduced={reduced} />
+            <IntroRole active={textActive} reduced={reduced} />
             <span className="intro-punctuation" aria-hidden="true">)</span>
           </span></p>
           <p className="intro-line intro-location"><span className="intro-line-inner">
             <Letters text="based in" />
-            <span className="intro-object intro-sky" aria-hidden="true"><img src="/assets/intro/sky_d554efb3.webp" alt="" /></span>
+            <span className="intro-object intro-rock" aria-hidden="true"><img src="/assets/intro/resin-rock_eb5c7d60.webp" alt="" /></span>
             <Letters text="London." />
           </span></p>
         </div>
