@@ -1,5 +1,4 @@
-import { lazy, Suspense, useEffect, useLayoutEffect, useRef, useState } from 'react';
-import gsap from 'gsap';
+import { lazy, Suspense, useEffect, useRef, useState } from 'react';
 import IntroRole from '../components/IntroRole';
 
 import './Introduction.css';
@@ -12,8 +11,7 @@ function Letters({text}: {text: string}) {
 }
 
 export default function Introduction() {
-  const root = useRef<HTMLElement>(null);
-  const [ready, setReady] = useState(false);
+  const introRef = useRef<HTMLElement>(null);
   const [textActive, setTextActive] = useState(true);
   const [reduced, setReduced] = useState(() => window.matchMedia('(prefers-reduced-motion: reduce)').matches);
 
@@ -24,73 +22,16 @@ export default function Introduction() {
     return () => media.removeEventListener('change', change);
   }, []);
 
-  useLayoutEffect(() => {
-    let started = false;
-    let complete = false;
-    let touchY: number | null = null;
-    let lastGesture = 0;
-    let timeline: gsap.core.Timeline;
-    const context = gsap.context(() => {
-      timeline = gsap.timeline({paused: true, onComplete: () => {
-        complete = true;
-        lastGesture = performance.now();
-        setReady(true);
-      }});
-      if (reduced) {
-        timeline.to('.intro-copy', {opacity: 0, duration: .15}, 0);
-        timeline.to('.intro-flowers', {opacity: 1, duration: .15}, 0);
-      } else {
-        timeline.to('.intro-line-inner', {
-          yPercent: -105, duration: .65, stagger: .055, ease: 'power2.inOut',
-        }, 0);
-        timeline.to('.intro-flowers', {opacity: 1, duration: .34, ease: 'power1.out'}, .42);
-      }
-    }, root);
-    const reveal = () => {
-      if (started) return;
-      started = true;
-      setTextActive(false);
-      timeline.play(0);
-    };
-    const wheel = (event: WheelEvent) => {
-      if (event.ctrlKey || event.deltaY === 0) return;
-      const now = performance.now();
-      if (complete && now - lastGesture > 220) return;
-      lastGesture = now;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      if (event.deltaY > 0) reveal();
-    };
-    const touchStart = (event: TouchEvent) => {
-      touchY = event.touches.length === 1 ? event.touches[0].clientY : null;
-    };
-    const touchMove = (event: TouchEvent) => {
-      if (complete || event.touches.length !== 1) return;
-      event.preventDefault();
-      if (touchY !== null && touchY - event.touches[0].clientY > 8) reveal();
-    };
-    const keyDown = (event: KeyboardEvent) => {
-      if (complete || !['ArrowDown', 'PageDown', 'Space'].includes(event.code)) return;
-      event.preventDefault(); event.stopImmediatePropagation(); reveal();
-    };
-    window.addEventListener('wheel', wheel, {passive: false, capture: true});
-    window.addEventListener('touchstart', touchStart, {passive: true});
-    window.addEventListener('touchmove', touchMove, {passive: false});
-    window.addEventListener('keydown', keyDown, true);
-    return () => {
-      context.revert();
-      window.removeEventListener('wheel', wheel, true);
-      window.removeEventListener('touchstart', touchStart);
-      window.removeEventListener('touchmove', touchMove);
-      window.removeEventListener('keydown', keyDown, true);
-    };
-  }, [reduced]);
-  return <main className="intro-sequence intro-slide" ref={root}>
-    <div className="intro-stage">
-      <section className="intro-flowers" aria-label="Explore my work" inert={!ready}>
-        <Suspense fallback={<p className="intro-loading">Opening the studio…</p>}><Flowers /></Suspense>
-      </section>
-      <section className="intro-overlay" aria-label="About Kiki" aria-hidden={ready}>
+  useEffect(() => {
+    const intro = introRef.current;
+    if (!intro) return;
+    const observer = new IntersectionObserver(([entry]) => setTextActive(entry.isIntersecting && entry.intersectionRatio > 0), { threshold: 0.001 });
+    observer.observe(intro);
+    return () => observer.disconnect();
+  }, []);
+
+  return <main className="intro-sequence">
+      <section ref={introRef} className="intro-overlay" aria-label="About Kiki">
         <div className="intro-copy">
           <h1 className="intro-line intro-greeting"><span className="intro-line-inner">
             <Letters text="Hi, I’m Kiki," />
@@ -104,12 +45,14 @@ export default function Introduction() {
           </span></p>
           <p className="intro-line intro-location"><span className="intro-line-inner">
             <Letters text="based in" />
-            <span className="intro-object intro-rock" aria-hidden="true"><img src="/assets/intro/resin-rock_eb5c7d60.webp" alt="" /></span>
+            <span className="intro-object intro-london" aria-hidden="true"><img src="/assets/intro/london-tower_76acff5c.webp" alt="" /></span>
             <Letters text="London." />
           </span></p>
         </div>
       </section>
-    </div>
+      <section className="intro-flowers" aria-label="Explore my work">
+        <Suspense fallback={<p className="intro-loading">Opening the studio…</p>}><Flowers /></Suspense>
+      </section>
   </main>;
 }
 

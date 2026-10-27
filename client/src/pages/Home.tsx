@@ -177,6 +177,8 @@ export default function Home() {
 
   useEffect(() => {
     if (!mountRef.current) return;
+    const mount = mountRef.current;
+    const embedded = Boolean(mount.closest('.intro-sequence'));
 
     /* ── SCENE SETUP ── */
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
@@ -188,7 +190,7 @@ export default function Home() {
     const scene  = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(CAMERA_FOV, window.innerWidth / window.innerHeight, 0.01, 200);
 
-    renderer.domElement.style.touchAction = 'none';
+    renderer.domElement.style.touchAction = embedded ? 'pan-y' : 'none';
     let zoom = 1;
 
     /* ── FLOWER STATE ── */
@@ -290,6 +292,7 @@ export default function Home() {
 
     /* ── KEYBOARD FALLBACK ── */
     const onKey = (e: KeyboardEvent) => {
+      if (embedded && e.code === 'Space') return;
       if (renderer.domElement.closest('[inert]') || renderer.domElement.getBoundingClientRect().top > 2) return;
       if (e.code === 'Space') {
         e.preventDefault();
@@ -352,8 +355,8 @@ export default function Home() {
     const onContextMenu = (e: MouseEvent) => e.preventDefault();
     let wheelCooldown = 0;
     const onWheel = (e: WheelEvent) => {
+      if (embedded && !e.ctrlKey) return;
       if (canvas.closest('[inert]') || canvas.getBoundingClientRect().top > 2) return;
-      if (!e.ctrlKey && e.deltaY < 0 && activeIdx === 0 && canvas.closest('.intro-sequence')) return;
       e.preventDefault();
       if (e.ctrlKey) {
         setZoom(zoom * Math.exp(-e.deltaY * 0.01));
@@ -401,7 +404,10 @@ export default function Home() {
 
     /* ── ANIMATION LOOP ── */
     let raf = 0;
+    let rendering = false;
+    let inView = false;
     const animate = () => {
+      if (!rendering) return;
       raf = requestAnimationFrame(animate);
       const dt   = clock.getDelta();
       const time = clock.getElapsedTime();
@@ -425,7 +431,21 @@ export default function Home() {
 
       renderer.render(scene, camera);
     };
-    animate();
+    const updateRendering = () => {
+      const visible = inView && !document.hidden;
+      if (visible === rendering) return;
+      rendering = visible;
+      if (rendering) {
+        clock.getDelta();
+        animate();
+      } else cancelAnimationFrame(raf);
+    };
+    const observer = new IntersectionObserver(([entry]) => {
+      inView = entry.isIntersecting && entry.intersectionRatio > 0;
+      updateRendering();
+    }, { threshold: 0.001 });
+    observer.observe(mount);
+    document.addEventListener('visibilitychange', updateRendering);
 
     /* ── RESIZE ── */
     const onResize = () => {
@@ -441,6 +461,8 @@ export default function Home() {
     return () => {
       disposed = true;
       cancelAnimationFrame(raf);
+      observer.disconnect();
+      document.removeEventListener('visibilitychange', updateRendering);
       window.clearTimeout(prefetchTimer);
       window.removeEventListener('keydown', onKey);
       window.removeEventListener('resize', onResize);
