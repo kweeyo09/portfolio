@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const roles = ['a designer', 'a storyteller', 'a professional fake rock lover', 'a matcha enthusiast'];
 
@@ -7,6 +7,8 @@ export default function IntroRole({ active, reduced }: { active: boolean; reduce
   const [hovered, setHovered] = useState(false);
   const [focused, setFocused] = useState(false);
   const [selected, setSelected] = useState(false);
+  const hoverBounds = useRef<DOMRect | null>(null);
+  const roleRef = useRef<HTMLSpanElement>(null);
   const paused = hovered || focused;
   const text = paused ? roles[0] : roles[index];
 
@@ -20,20 +22,37 @@ export default function IntroRole({ active, reduced }: { active: boolean; reduce
         setSelected(true);
         timer = window.setTimeout(() => {
           setIndex(value => (value + 1) % roles.length);
-          timer = window.setTimeout(() => { setSelected(false); schedule(); }, 180);
-        }, 180);
-      }, 2200);
+          timer = window.setTimeout(() => { setSelected(false); schedule(); }, 90);
+        }, 90);
+      }, 1000);
     };
     schedule();
     return () => window.clearTimeout(timer);
   }, [active, reduced, paused]);
 
+  useEffect(() => {
+    if (!hovered) return;
+    const trackPointer = (event: PointerEvent) => {
+      const original = hoverBounds.current;
+      const current = roleRef.current?.getBoundingClientRect();
+      const contains = (bounds: DOMRect | null | undefined) => bounds && event.clientX >= bounds.left && event.clientX <= bounds.right && event.clientY >= bounds.top && event.clientY <= bounds.bottom;
+      if (!contains(original) && !contains(current)) setHovered(false);
+    };
+    const leaveWindow = () => setHovered(false);
+    window.addEventListener('pointermove', trackPointer, { passive: true });
+    window.addEventListener('blur', leaveWindow);
+    return () => {
+      window.removeEventListener('pointermove', trackPointer);
+      window.removeEventListener('blur', leaveWindow);
+    };
+  }, [hovered]);
+
   return <span
-    className={`intro-role${selected && !paused ? ' is-selected' : ''}`}
+    ref={roleRef}
+    className={`intro-role${selected && !paused ? ' is-selected' : ''}${paused ? ' is-paused' : ''}`}
     tabIndex={active ? 0 : -1}
     aria-label={text}
-    onPointerEnter={event => { if (event.pointerType !== 'touch') { setHovered(true); setIndex(0); } }}
-    onPointerLeave={event => { if (event.pointerType !== 'touch') setHovered(false); }}
+    onPointerEnter={event => { if (event.pointerType !== 'touch') { hoverBounds.current = event.currentTarget.getBoundingClientRect(); setHovered(true); setIndex(0); } }}
     onFocus={() => { setFocused(true); setIndex(0); }}
     onBlur={() => setFocused(false)}
   >

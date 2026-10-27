@@ -25,9 +25,34 @@ export default function Introduction() {
   useEffect(() => {
     const intro = introRef.current;
     if (!intro) return;
-    const observer = new IntersectionObserver(([entry]) => setTextActive(entry.isIntersecting && entry.intersectionRatio > 0), { threshold: 0.001 });
-    observer.observe(intro);
-    return () => observer.disconnect();
+    let frame = 0;
+    let textVisible = true;
+    const updateScroll = () => {
+      frame = 0;
+      const bounds = intro.getBoundingClientRect();
+      const progress = Math.min(1, Math.max(0, -bounds.top / bounds.height * 1.6));
+      const complete = progress >= 1;
+      intro.style.setProperty('--intro-scroll', String(progress));
+      intro.classList.toggle('is-scrolled', complete);
+      intro.inert = complete;
+      intro.setAttribute('aria-hidden', String(complete));
+      const visible = !complete && bounds.bottom > 0 && bounds.top < window.innerHeight;
+      if (visible !== textVisible) {
+        textVisible = visible;
+        setTextActive(visible);
+      }
+    };
+    const scheduleScroll = () => {
+      if (!frame) frame = requestAnimationFrame(updateScroll);
+    };
+    updateScroll();
+    window.addEventListener('scroll', scheduleScroll, { passive: true });
+    window.addEventListener('resize', scheduleScroll);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.removeEventListener('scroll', scheduleScroll);
+      window.removeEventListener('resize', scheduleScroll);
+    };
   }, []);
 
   return <main className="intro-sequence">
