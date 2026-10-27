@@ -3,10 +3,10 @@
  * Four-flower Particle Bloom
  *
  * Flowers (left → right):
- *   0 Pomegranate → Cool things I have been working on
- *   1 Lily → UI/UX design
- *   2 Lotus → Graphic & Campaign
- *   3 Anthurium → Motion Graphics
+ *   0 Lily → UI/UX design
+ *   1 Lotus → Graphic & Campaign
+ *   2 Anthurium → Motion Graphics
+ *   3 Pomegranate → Cool things I have been working on
  *
  * Keyboard fallback:
  *   Space bar / ← →   → scatter / cycle
@@ -20,21 +20,22 @@ import { useEffect, useRef } from 'react';
 import { useLocation } from 'wouter';
 import SocialLinks from '../components/SocialLinks';
 import * as THREE from 'three';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import './Home.css';
 
 
 /* ── PARTICLE DATA ─────────────────────────────────────────────── */
 const FLOWER_URLS = [
-  '/assets/flower-pomegranate_a0e03fde.bin',
   '/assets/flower-lily_dbe070b1.bin',
   '/assets/flower-lotus_439ad204.bin',
   '/assets/flower-anthurium_1c7fe559.bin',
+  '/assets/flower-pomegranate_a0e03fde.bin',
 ];
 // Must match POS_SCALE in scripts/bake-flowers.py
 const POS_SCALE = 1 / 8192;
 // Optical scale: compensate for sparse petals and slender silhouettes in world space.
 // Lotus retains its original flat orientation; all models use the same camera.
-const FLOWER_VISUAL_SCALES = [1.15, 1.1, 1, 1.2];
+const FLOWER_VISUAL_SCALES = [1.1, 1, 1.2, 1.15];
 
 // Started once per session, so returning to the homepage is instant
 let flowerData: Promise<ArrayBuffer>[] | null = null;
@@ -48,8 +49,8 @@ const loadFlowerData = () => {
   return flowerData;
 };
 
-const FLOWER_EN = ["Cool things I've been working on", 'UI/UX design', 'Graphic & Campaign', 'Motion Graphics'];
-const PORTFOLIO_ROUTES = ['/cool-things', '/ui-design', '/graphic-campaign', '/3d-motion'];
+const FLOWER_EN = ['UI/UX design', 'Graphic & Campaign', 'Motion Graphics', "Cool things I've been working on"];
+const PORTFOLIO_ROUTES = ['/ui-design', '/graphic-campaign', '/3d-motion', '/cool-things'];
 const prefetchRoutes = () => {
   void import('./UIDesign');
   void import('./GraphicCampaign');
@@ -263,7 +264,7 @@ export default function Home() {
     const updateLabel = () => {
       if (!labelRef.current) return;
       labelRef.current.innerHTML =
-        `<span style="font-size:clamp(1.7rem,7vw,2.2rem);letter-spacing:0.08em;font-weight:normal;color:#fff;font-family:'Instrument Serif',serif;font-style:italic">${FLOWER_EN[activeIdx]}</span>`;
+        `<span class="flower-title">${FLOWER_EN[activeIdx]}</span>`;
     };
     updateLabel();
 
@@ -473,7 +474,7 @@ export default function Home() {
       <div ref={labelRef} style={{
         // Sits in the top band; the flowers are drawn below it (FLOWER_Y)
         position: 'absolute', top: 'clamp(124px, 17vh, 160px)', left: '50%',
-        transform: 'translateX(-50%)', width: 'min(92vw, 760px)', whiteSpace: 'normal',
+        transform: 'translateX(-50%)', width: 'min(92vw, 1320px)', whiteSpace: 'normal',
         color: '#fff', fontFamily: "'Instrument Serif', serif", fontStyle: 'italic',
         textAlign: 'center', pointerEvents: 'none', userSelect: 'none',
         transition: 'opacity 0.3s',
@@ -486,6 +487,14 @@ export default function Home() {
         pointerEvents: 'none',
         padding: '0 16px',
       }}>
+        <nav className="flower-navigation" aria-label="Browse portfolio sections">
+          <button type="button" className="flower-arrow" aria-label="Previous section" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', code: 'ArrowLeft' }))}>
+            <ArrowLeft aria-hidden="true" />
+          </button>
+          <button type="button" className="flower-arrow" aria-label="Next section" onClick={() => window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight' }))}>
+            <ArrowRight aria-hidden="true" />
+          </button>
+        </nav>
         {/* Click instruction */}
         <div style={{
           color: 'rgba(255,255,255,0.75)', fontFamily: "'Barlow', sans-serif",
@@ -557,36 +566,7 @@ export default function Home() {
         </div>
       </div>
 
-      {/* NEXT button - bottom right */}
-      <button
-        className="liquid-glass-strong flower-next"
-        onClick={() => {
-          const event = new KeyboardEvent('keydown', { key: 'ArrowRight', code: 'ArrowRight' });
-          window.dispatchEvent(event);
-        }}
-        style={{
-          position: 'absolute',
-          borderRadius: 8,
-          color: '#fff',
-          fontFamily: "'Barlow', sans-serif",
-          fontSize: 'clamp(0.7rem, 2vw, 0.85rem)',
-          letterSpacing: '0.15em',
-          padding: 'clamp(8px, 1.5vw, 12px) clamp(12px, 2vw, 20px)',
-          cursor: 'pointer',
-          transition: 'all 0.3s ease',
-          zIndex: 1000,
-          display: 'block',
-          fontWeight: '400',
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.boxShadow = '4px 4px 4px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.25), 0 0 16px rgba(255,255,255,0.08)';
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.boxShadow = '4px 4px 4px rgba(0,0,0,0.05), inset 0 1px 1px rgba(255,255,255,0.15)';
-        }}
-      >
-         NEXT →
-      </button>
+
     </div>
   );
 }

@@ -5,7 +5,7 @@ import './Introduction.css';
 
 
 const Flowers = lazy(() => import('./Home'));
-const roles = ['a vibe coder', 'a designer', 'a matcha enthusiast'];
+const roles = ['a designer', 'a vibe coder', 'a matcha enthusiast'];
 
 function Letters({text}: {text: string}) {
   return <><span className="intro-sr-only">{text}</span><span aria-hidden="true">{Array.from(text).map((letter, index) => <span className="intro-letter" key={index}>{letter === ' ' ? '\u00a0' : letter}</span>)}</span></>;
@@ -115,9 +115,21 @@ export default function Introduction() {
       </section>
       <section className="intro-overlay" aria-label="About Kiki" aria-hidden={ready}>
         <div className="intro-copy">
-          <h1 className="intro-line"><span className="intro-line-inner"><Letters text="Hi, I’m Kiki," /></span></h1>
-          <p className="intro-line intro-role-line"><span className="intro-line-inner"><HighlightRole active={textActive} reduced={reduced} /></span></p>
-          <p className="intro-line intro-location"><span className="intro-line-inner"><Letters text="based in London." /></span></p>
+          <h1 className="intro-line intro-greeting"><span className="intro-line-inner">
+            <Letters text="Hi, I’m Kiki," />
+            <span className="intro-object intro-flower" aria-hidden="true"><img src="/assets/intro/chrome-flower_2bd50bb5.webp" alt="" /></span>
+          </span></h1>
+          <p className="intro-line intro-role-line"><span className="intro-line-inner">
+            <span className="intro-punctuation" aria-hidden="true">(</span>
+            <span className="intro-object intro-keyboard" aria-hidden="true"><img src="/assets/0001_655eb5c3.webp" alt="" /></span>
+            <HighlightRole active={textActive} reduced={reduced} />
+            <span className="intro-punctuation" aria-hidden="true">)</span>
+          </span></p>
+          <p className="intro-line intro-location"><span className="intro-line-inner">
+            <Letters text="based in" />
+            <span className="intro-object intro-sky" aria-hidden="true"><img src="/assets/intro/sky_d554efb3.webp" alt="" /></span>
+            <Letters text="London." />
+          </span></p>
         </div>
       </section>
     </div>
