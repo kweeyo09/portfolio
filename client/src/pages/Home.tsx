@@ -168,12 +168,14 @@ function buildParticles(buf: ArrayBuffer): THREE.BufferGeometry {
 }
 
 /* ── MAIN COMPONENT ─────────────────────────────────────────────── */
-export default function Home() {
+export default function Home({ onReady }: { onReady?: () => void } = {}) {
   const mountRef      = useRef<HTMLDivElement>(null);
   const labelRef      = useRef<HTMLDivElement>(null);
   const [, navigate]  = useLocation();
   const navigateRef   = useRef(navigate);
   navigateRef.current = navigate;
+  const onReadyRef = useRef(onReady);
+  onReadyRef.current = onReady;
 
   useEffect(() => {
     if (!mountRef.current) return;
@@ -254,6 +256,7 @@ export default function Home() {
         flowers[idx].loaded = true;
 
         updateLabel();
+        if (idx === 0) onReadyRef.current?.();
       }).catch(err => {
         console.error(`[LOAD] Failed: ${FLOWER_EN[idx]}`, err);
       });

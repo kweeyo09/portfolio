@@ -28,7 +28,7 @@ function Router() {
   return (
     <Switch>
       <Route path={"/"} component={Introduction} />
-      <Route path={"/flowers"} component={Home} />
+      <Route path={"/flowers"}><Home /></Route>
       <Route path={"/cool-things"} component={CoolThings} />
       <Route path={"/paper-art"} component={PaperArt} />
       <Route path={"/ui-design"} component={UIDesign} />
